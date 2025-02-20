@@ -4,12 +4,12 @@ const Home = () => {
             <div className="text-center w-full h-[60dvh] space-y-8 flex flex-wrap justify-center items-center">
                 <div className="w-full space-y-8">
                     <h1
-                        data-aos="fade-up"
+                        data-aos="fade-down"
                         className="text-5xl font-light text-gray-800 w-full"
                     >
                         Добро пожаловать в PC Compare
                     </h1>
-                    <p data-aos="fade-up" data-aos-delay="200" className="text-lg text-gray-600 w-full">
+                    <p data-aos="fade-down" data-aos-delay="200" className="text-lg text-gray-600 w-full">
                         Лучший способ сравнить характеристики компьютеров перед покупкой.
                     </p>
                 </div>
@@ -29,7 +29,7 @@ const Home = () => {
                     </button>
                 </div>
             </div>
-            
+
         </div>
     );
 };

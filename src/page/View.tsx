@@ -4,7 +4,7 @@ const View = () => {
 
     return (
         <div className="w-full py-12 space-y-16">
-            <h1 className="text-4xl font-light text-gray-800 text-center mb-28">Примеры ПК</h1>
+            <h1 data-aos="fade-down" className="text-4xl font-light text-gray-800 text-center mb-28">Примеры ПК</h1>
 
             {computers.map((pc, index) => (
                 <div

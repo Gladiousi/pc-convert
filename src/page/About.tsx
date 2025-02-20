@@ -2,6 +2,8 @@ import Faq from "../components/faq";
 
 const About = () => {
 
+    //! TODO: fix animation on hover
+
     return (
         <div>
             <div className="space-y-8 text-center w-full h-[40dvh] flex flex-wrap items-center">
