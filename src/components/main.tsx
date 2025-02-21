@@ -16,7 +16,7 @@ const Main = () => {
 
     return (
         <main className="container mx-auto p-8">
-            <div className="bg-white shadow-lg rounded-2xl p-6 min-h-[60vh] transition-all duration-300">
+            <div className="bg-white shadow-lg rounded-2xl p-6 min-h-[80vh] transition-all duration-300">
                 {activeTab === "home" && <Home />}
                 {activeTab === "compare" && <Compare />}
                 {activeTab === "view" && <View />}

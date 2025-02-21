@@ -1,12 +1,12 @@
 const Footer = () => {
     return (
       <footer className="bg-gray-100 py-8 border-t border-gray-200">
-        <div className="container mx-auto flex flex-col md:flex-row items-center justify-between px-12">
-          <div className="text-center md:text-left w-[30%]">
+        <div className="container mx-auto flex flex-col md:flex-row items-center justify-between px-24">
+          <div data-aos="fade-up-right" className="text-center md:text-left w-[30%]">
             <h2 className="text-2xl font-semibold text-gray-800">PC Compare</h2>
           </div>
   
-          <div className="flex space-x-4 my-4 md:my-0 w-[30%] justify-center">
+          <div data-aos="fade-up" className="flex space-x-4 my-4 md:my-0 w-[30%] justify-center">
             <a href="#" className="text-gray-600 hover:text-blue-500 transition">
               <i className="fab fa-facebook text-xl"></i>
             </a>
@@ -21,7 +21,7 @@ const Footer = () => {
             </a>
           </div>
   
-          <div className="text-center md:text-right w-[30%]">
+          <div data-aos="fade-up-left" className="text-center md:text-right w-[30%]">
             <p className="text-gray-600 text-sm">Нужна помощь? Свяжитесь с нами:</p>
             <a href="mailto:support@pccompare.com" className="text-blue-500 hover:underline text-sm">
               support@pccompare.com
