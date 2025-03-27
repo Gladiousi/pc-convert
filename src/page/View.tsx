@@ -9,7 +9,7 @@ const View = () => {
             {computers.map((pc, index) => (
                 <div
                     key={index}
-                    data-aos="fade-up"
+                    data-aos={index % 2 === 0 ? "fade-up-right" : "fade-up-left"}
                     className={`flex flex-col md:flex-row items-center ${pc.side === "left" ? "md:flex-row" : "md:flex-row-reverse"} gap-8 h-[30dvh]`}
                 >
                     <img src={pc.image} alt={pc.title} className="w-full md:w-1/2 rounded-lg shadow-lg" />

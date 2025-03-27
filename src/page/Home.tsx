@@ -1,4 +1,9 @@
+import { useTabStore } from "../store/useTabStore";
+
+
 const Home = () => {
+    const { setActiveTab } = useTabStore();
+
     return (
         <div>
             <div className="text-center w-full h-[60dvh] space-y-8 flex flex-wrap justify-center items-center">
@@ -9,7 +14,11 @@ const Home = () => {
                     >
                         Добро пожаловать в PC Compare
                     </h1>
-                    <p data-aos="fade-down" data-aos-delay="200" className="text-lg text-gray-600 w-full">
+                    <p
+                        data-aos="fade-down"
+                        data-aos-delay="200"
+                        className="text-lg text-gray-600 w-full"
+                    >
                         Лучший способ сравнить характеристики компьютеров перед покупкой.
                     </p>
                 </div>
@@ -17,6 +26,7 @@ const Home = () => {
                     <button
                         data-aos="zoom-in"
                         className="px-6 py-3 bg-blue-500 text-white text-lg rounded-full shadow-md hover:bg-blue-600 transition"
+                        onClick={() => setActiveTab("compare")}
                     >
                         Начать сравнение
                     </button>
@@ -24,12 +34,12 @@ const Home = () => {
                         data-aos="zoom-in"
                         data-aos-delay="200"
                         className="px-6 py-3 bg-gray-200 text-gray-800 text-lg rounded-full shadow-md hover:bg-gray-300 transition"
+                        onClick={() => setActiveTab("about")}
                     >
                         Узнать больше
                     </button>
                 </div>
             </div>
-
         </div>
     );
 };
