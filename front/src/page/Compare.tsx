@@ -61,6 +61,17 @@ const Compare: React.FC = () => {
         }
     };
 
+    const getComponentSummary = (pc: PCConfig): string[] => {
+        const summary: string[] = [];
+        if (pc.cpu) summary.push(`Процессор: ${pc.cpu} (${getComponentInfo("cpu", pc.cpu)}, Мощность: ${powerScores.cpu[pc.cpu].power})`);
+        if (pc.gpu) summary.push(`Видеокарта: ${pc.gpu} (${getComponentInfo("gpu", pc.gpu)}, Мощность: ${powerScores.gpu[pc.gpu].power})`);
+        if (pc.ram) summary.push(`RAM: ${pc.ram} (${getComponentInfo("ram", pc.ram)}, Мощность: ${powerScores.ram[pc.ram].power})`);
+        if (pc.storage) summary.push(`Накопитель: ${pc.storage} (${getComponentInfo("storage", pc.storage)}, Мощность: ${powerScores.storage[pc.storage].power})`);
+        if (pc.motherboard) summary.push(`Материнская плата: ${pc.motherboard} (${getComponentInfo("motherboard", pc.motherboard)}, Мощность: ${powerScores.motherboard[pc.motherboard].power})`);
+        if (pc.psu) summary.push(`Блок питания: ${pc.psu} (${getComponentInfo("psu", pc.psu)}, Мощность: ${powerScores.psu[pc.psu].power})`);
+        return summary;
+    };
+
     const renderSelect = (
         label: string,
         value: string,
@@ -113,6 +124,7 @@ const Compare: React.FC = () => {
             )}
 
             <div className="flex flex-col md:flex-row justify-center gap-8 w-full max-w-6xl">
+                {/* PC 1 Card */}
                 <div
                     className="flex-1 bg-white rounded-2xl shadow-lg p-6 transform hover:scale-105 transition-transform duration-300"
                     data-aos="fade-up"
@@ -128,6 +140,7 @@ const Compare: React.FC = () => {
                     </div>
                 </div>
 
+                {/* PC 2 Card */}
                 <div
                     className="flex-1 bg-white rounded-2xl shadow-lg p-6 transform hover:scale-105 transition-transform duration-300"
                     data-aos="fade-up"
@@ -142,6 +155,34 @@ const Compare: React.FC = () => {
                         {renderSelect("Материнская плата", pc2.motherboard, (val) => setPc2({ ...pc2, motherboard: val }), powerScores.motherboard, "motherboard", "400")}
                         {renderSelect("Блок питания", pc2.psu, (val) => setPc2({ ...pc2, psu: val }), powerScores.psu, "psu", "500")}
                     </div>
+                </div>
+            </div>
+
+            {/* Краткое описание выбранных компонентов */}
+            <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8" data-aos="fade-up" data-aos-delay="300">
+                <div className="flex-1 bg-white rounded-2xl shadow-lg p-6">
+                    <h4 className="text-xl font-semibold text-gray-800 mb-3">Сборка ПК 1</h4>
+                    {getComponentSummary(pc1).length > 0 ? (
+                        <ul className="list-disc list-inside text-gray-700 text-sm">
+                            {getComponentSummary(pc1).map((item, index) => (
+                                <li key={index}>{item}</li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-gray-600 text-sm">Компоненты не выбраны</p>
+                    )}
+                </div>
+                <div className="flex-1 bg-white rounded-2xl shadow-lg p-6">
+                    <h4 className="text-xl font-semibold text-gray-800 mb-3">Сборка ПК 2</h4>
+                    {getComponentSummary(pc2).length > 0 ? (
+                        <ul className="list-disc list-inside text-gray-700 text-sm">
+                            {getComponentSummary(pc2).map((item, index) => (
+                                <li key={index}>{item}</li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-gray-600 text-sm">Компоненты не выбраны</p>
+                    )}
                 </div>
             </div>
 
