@@ -3,7 +3,7 @@ import { useTabStore } from "../store/useTabStore";
 import { powerScores, PCConfig, checkCompatibility, calculatePower } from "../data/pcData";
 
 const Compare: React.FC = () => {
-    const { token, setActiveTab } = useTabStore();
+    const { token, setToken, setActiveTab } = useTabStore();
     const [pc1, setPc1] = useState<PCConfig>({ cpu: "", gpu: "", ram: "", storage: "", motherboard: "", psu: "" });
     const [pc2, setPc2] = useState<PCConfig>({ cpu: "", gpu: "", ram: "", storage: "", motherboard: "", psu: "" });
     const [result, setResult] = useState<{ pc1Power: number; pc2Power: number } | null>(null);
@@ -18,6 +18,8 @@ const Compare: React.FC = () => {
                     setActiveTab("home");
                 }
             });
+        } else {
+            setActiveTab("home"); 
         }
     }, [token, setActiveTab]);
 
@@ -36,6 +38,12 @@ const Compare: React.FC = () => {
         const pc1Power = calculatePower(pc1);
         const pc2Power = calculatePower(pc2);
         setResult({ pc1Power, pc2Power });
+    };
+
+    const handleLogout = () => {
+        setToken(null); 
+        localStorage.removeItem("token"); 
+        setActiveTab("home"); 
     };
 
     const getComponentInfo = (type: keyof typeof powerScores, value: string): string => {
@@ -106,6 +114,15 @@ const Compare: React.FC = () => {
 
     return (
         <div className="w-full min-h-[80dvh] flex flex-col justify-center items-center space-y-10 p-6 relative">
+            <div className="absolute top-4 right-4 flex items-center space-x-4">
+                <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition-all duration-300"
+                >
+                    Выйти
+                </button>
+            </div>
+
             <h1 data-aos="fade-down" className="text-5xl font-light text-gray-800">
                 Сравнение компьютеров
             </h1>
@@ -114,7 +131,7 @@ const Compare: React.FC = () => {
             </p>
 
             {errors.length > 0 && (
-                <div className="sticky top-4 right-4 w-80 bg-red-100 border border-red-400 text-red-700 p-4 rounded-lg shadow-lg z-20" data-aos="fade-left">
+                <div className="absolute top-4 right-20 w-80 bg-red-100 border border-red-400 text-red-700 p-4 rounded-lg shadow-lg z-20" data-aos="fade-left">
                     <ul className="list-disc list-inside text-sm">
                         {errors.map((error, index) => (
                             <li key={index}>{error}</li>
@@ -124,7 +141,6 @@ const Compare: React.FC = () => {
             )}
 
             <div className="flex flex-col md:flex-row justify-center gap-8 w-full max-w-6xl">
-                {/* PC 1 Card */}
                 <div
                     className="flex-1 bg-white rounded-2xl shadow-lg p-6 transform hover:scale-105 transition-transform duration-300"
                     data-aos="fade-up"
@@ -140,7 +156,6 @@ const Compare: React.FC = () => {
                     </div>
                 </div>
 
-                {/* PC 2 Card */}
                 <div
                     className="flex-1 bg-white rounded-2xl shadow-lg p-6 transform hover:scale-105 transition-transform duration-300"
                     data-aos="fade-up"
@@ -158,7 +173,6 @@ const Compare: React.FC = () => {
                 </div>
             </div>
 
-            {/* Краткое описание выбранных компонентов */}
             <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8" data-aos="fade-up" data-aos-delay="300">
                 <div className="flex-1 bg-white rounded-2xl shadow-lg p-6">
                     <h4 className="text-xl font-semibold text-gray-800 mb-3">Сборка ПК 1</h4>

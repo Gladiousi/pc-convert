@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import { FormEvent, useState } from "react";
 import { useTabStore } from "../store/useTabStore";
 
 const Auth: React.FC = () => {
+    const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [isLogin, setIsLogin] = useState(true);
+    const [error, setError] = useState("");
     const { setToken, setActiveTab } = useTabStore();
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        setError("");
+
         const url = isLogin ? "http://localhost:5000/login" : "http://localhost:5000/register";
         try {
             const response = await fetch(url, {
@@ -16,74 +19,85 @@ const Auth: React.FC = () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
+
             const data = await response.json();
 
-            if (response.ok && data.token) {
+            if (!response.ok) {
+                throw new Error(data.error || "Something went wrong!");
+            }
+
+            if (isLogin) {
                 setToken(data.token);
+                localStorage.setItem("token", data.token);
                 setActiveTab("compare");
             } else {
-                console.error(data.error);
+                setError("Регистрация успешна! Теперь войдите.");
+                setIsLogin(true);
             }
-        } catch (error) {
-            console.error("Error during authentication:", error);
+
+            setEmail("");
+            setPassword("");
+        } catch (err: any) {
+            setError(err.message);
         }
     };
 
     return (
-        <div className="text-center w-full min-h-[60dvh] flex flex-col justify-center items-center space-y-8">
-            <div className="w-full max-w-md space-y-6">
-                <h2
-                    data-aos="fade-down"
-                    className="text-4xl font-light text-gray-800"
-                >
+        <div className="w-full min-h-[60dvh] flex justify-center items-center p-6">
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+                <h1 data-aos="fade-down" className="text-3xl font-light text-gray-800 mb-6 text-center">
                     {isLogin ? "Вход" : "Регистрация"}
-                </h2>
-                <p
-                    data-aos="fade-down"
-                    data-aos-delay="200"
-                    className="text-lg text-gray-600"
-                >
-                    {isLogin
-                        ? "Войдите, чтобы начать сравнение"
-                        : "Создайте аккаунт для доступа"}
-                </p>
+                </h1>
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Email"
-                        className="w-full p-4 border border-gray-300 rounded-full text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                        required
-                        data-aos="fade-up"
-                    />
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Пароль"
-                        className="w-full p-4 border border-gray-300 rounded-full text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                        required
-                        data-aos="fade-up"
-                        data-aos-delay="100"
-                    />
+                    <div data-aos="fade-up">
+                        <label className="block text-sm font-medium text-gray-700">Email</label>
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full p-3 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                            placeholder="Введите ваш email"
+                            required
+                        />
+                    </div>
+                    <div data-aos="fade-up" data-aos-delay="100">
+                        <label className="block text-sm font-medium text-gray-700">Пароль</label>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full p-3 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                            placeholder="Введите ваш пароль"
+                            required
+                        />
+                    </div>
+                    {error && (
+                        <p data-aos="fade-up" className="text-red-600 text-sm text-center">
+                            {error}
+                        </p>
+                    )}
                     <button
                         type="submit"
-                        className="w-full px-6 py-3 bg-blue-500 text-white text-lg rounded-full shadow-md hover:bg-blue-600 transition"
+                        className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 transition-all duration-300"
                         data-aos="zoom-in"
                         data-aos-delay="200"
                     >
                         {isLogin ? "Войти" : "Зарегистрироваться"}
                     </button>
                 </form>
-                <button
-                    onClick={() => setIsLogin(!isLogin)}
-                    className="text-blue-500 hover:underline text-lg"
+                <p
+                    className="mt-4 text-center text-gray-600 cursor-pointer hover:text-blue-500 transition"
+                    onClick={() => {
+                        setIsLogin(!isLogin);
+                        setError("");
+                        setEmail("");
+                        setPassword("");
+                    }}
                     data-aos="fade-up"
                     data-aos-delay="300"
                 >
                     {isLogin ? "Нет аккаунта? Зарегистрируйтесь" : "Уже есть аккаунт? Войдите"}
-                </button>
+                </p>
             </div>
         </div>
     );
