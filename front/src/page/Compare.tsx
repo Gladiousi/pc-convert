@@ -27,15 +27,12 @@ const Compare: React.FC = () => {
     const handleCompare = () => {
         setErrors([]);
         setResult(null);
-
         const pc1Errors = checkCompatibility(pc1);
         const pc2Errors = checkCompatibility(pc2);
-
         if (pc1Errors.length > 0 || pc2Errors.length > 0) {
             setErrors([...pc1Errors.map(e => `ПК 1: ${e}`), ...pc2Errors.map(e => `ПК 2: ${e}`)]);
             return;
         }
-
         const pc1Power = calculatePower(pc1);
         const pc2Power = calculatePower(pc2);
         setResult({ pc1Power, pc2Power });
@@ -49,7 +46,6 @@ const Compare: React.FC = () => {
     const getComponentInfo = (type: keyof typeof powerScores, value: string): string => {
         if (!value) return "";
         const component = powerScores[type][value as keyof typeof powerScores[typeof type]];
-
         switch (type) {
             case "cpu": return `Сокет: ${(component as typeof powerScores.cpu[string]).socket}`;
             case "gpu": return `Разъём: ${(component as typeof powerScores.gpu[string]).connector}`;
@@ -77,19 +73,16 @@ const Compare: React.FC = () => {
     const renderSelect = (
         label: string,
         value: string,
-        onChange: (value: | string) => void,
+        onChange: (value: string) => void,
         options: Record<string, any>,
-        type: keyof typeof powerScores,
-        aosDelay?: string
+        type: keyof typeof powerScores
     ) => (
         <div className="space-y-1 relative group">
             <label className="text-sm font-medium text-gray-700">{label}</label>
             <select
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full p-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                data-aos="fade-up"
-                data-aos-delay={aosDelay}
+                className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm sm:text-base"
             >
                 <option value="">Выберите {label.toLowerCase()}</option>
                 {Object.keys(options).map((option) => (
@@ -99,7 +92,7 @@ const Compare: React.FC = () => {
                 ))}
             </select>
             {value && (
-                <div className="absolute left-0 top-full mt-1 hidden group-hover:block bg-gray-800 text-white text-sm p-2 rounded-lg shadow-lg z-10">
+                <div className="absolute left-0 top-full mt-1 hidden group-hover:block bg-gray-800 text-white text-xs sm:text-sm p-2 rounded-lg shadow-lg z-10">
                     {getComponentInfo(type, value)}
                 </div>
             )}
@@ -107,34 +100,18 @@ const Compare: React.FC = () => {
     );
 
     return (
-        <div className="w-full min-h-[80dvh] flex flex-col justify-center items-center space-y-10 p-6 bg-gray-50">
-            <div className="absolute top-4 right-4 flex items-center space-x-4">
-                {role === "ADMIN" && (
-                    <button
-                        onClick={() => setActiveTab("admin")}
-                        className="px-4 py-2 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600 transition-all duration-300"
-                    >
-                        Админка
-                    </button>
-                )}
-                <button
-                    onClick={handleLogout}
-                    className="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition-all duration-300"
-                >
-                    Выйти
-                </button>
-            </div>
+        <div className="w-full min-h-[80dvh] flex flex-col justify-center items-center space-y-8 p-4 sm:p-6 bg-gray-50 relative">
 
-            <h1 data-aos="fade-down" className="text-5xl font-light text-gray-800">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-light text-gray-800 text-center">
                 Сравнение компьютеров
             </h1>
-            <p data-aos="fade-down" data-aos-delay="200" className="text-xl text-gray-600 max-w-3xl text-center">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl text-center">
                 Соберите два компьютера, учитывая совместимость комплектующих, и сравните их мощность!
             </p>
 
             {errors.length > 0 && (
-                <div className="absolute top-4 right-20 w-80 bg-red-100 border border-red-400 text-red-700 p-4 rounded-lg shadow-lg z-20" data-aos="fade-left">
-                    <ul className="list-disc list-inside text-sm">
+                <div className="sticky top-10 w-64 sm:w-80 bg-red-100 border border-red-400 text-red-700 p-4 rounded-lg shadow-lg z-20">
+                    <ul className="list-disc list-inside text-xs sm:text-sm">
                         {errors.map((error, index) => (
                             <li key={index}>{error}</li>
                         ))}
@@ -142,86 +119,84 @@ const Compare: React.FC = () => {
                 </div>
             )}
 
-            <div className="flex flex-col md:flex-row justify-center gap-8 w-full max-w-6xl">
-                <div className="flex-1 bg-white rounded-2xl shadow-lg p-6 transform hover:scale-105 transition-transform duration-300" data-aos="fade-up">
-                    <h3 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Компьютер 1</h3>
-                    <div className="space-y-4">
+            <div className="flex flex-col lg:flex-row gap-6 w-full max-w-6xl">
+                <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 flex-1">
+                    <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 text-center">Компьютер 1</h3>
+                    <div className="space-y-3 sm:space-y-4">
                         {renderSelect("Процессор", pc1.cpu, (val) => setPc1({ ...pc1, cpu: val }), powerScores.cpu, "cpu")}
-                        {renderSelect("Видеокарта", pc1.gpu, (val) => setPc1({ ...pc1, gpu: val }), powerScores.gpu, "gpu", "100")}
-                        {renderSelect("RAM", pc1.ram, (val) => setPc1({ ...pc1, ram: val }), powerScores.ram, "ram", "200")}
-                        {renderSelect("Накопитель", pc1.storage, (val) => setPc1({ ...pc1, storage: val }), powerScores.storage, "storage", "300")}
-                        {renderSelect("Материнская плата", pc1.motherboard, (val) => setPc1({ ...pc1, motherboard: val }), powerScores.motherboard, "motherboard", "400")}
-                        {renderSelect("Блок питания", pc1.psu, (val) => setPc1({ ...pc1, psu: val }), powerScores.psu, "psu", "500")}
+                        {renderSelect("Видеокарта", pc1.gpu, (val) => setPc1({ ...pc1, gpu: val }), powerScores.gpu, "gpu")}
+                        {renderSelect("RAM", pc1.ram, (val) => setPc1({ ...pc1, ram: val }), powerScores.ram, "ram")}
+                        {renderSelect("Накопитель", pc1.storage, (val) => setPc1({ ...pc1, storage: val }), powerScores.storage, "storage")}
+                        {renderSelect("Материнская плата", pc1.motherboard, (val) => setPc1({ ...pc1, motherboard: val }), powerScores.motherboard, "motherboard")}
+                        {renderSelect("Блок питания", pc1.psu, (val) => setPc1({ ...pc1, psu: val }), powerScores.psu, "psu")}
                     </div>
                 </div>
 
-                <div className="flex-1 bg-white rounded-2xl shadow-lg p-6 transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="200">
-                    <h3 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Компьютер 2</h3>
-                    <div className="space-y-4">
+                <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 flex-1">
+                    <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-4 text-center">Компьютер 2</h3>
+                    <div className="space-y-3 sm:space-y-4">
                         {renderSelect("Процессор", pc2.cpu, (val) => setPc2({ ...pc2, cpu: val }), powerScores.cpu, "cpu")}
-                        {renderSelect("Видеокарта", pc2.gpu, (val) => setPc2({ ...pc2, gpu: val }), powerScores.gpu, "gpu", "100")}
-                        {renderSelect("RAM", pc2.ram, (val) => setPc2({ ...pc2, ram: val }), powerScores.ram, "ram", "200")}
-                        {renderSelect("Накопитель", pc2.storage, (val) => setPc2({ ...pc2, storage: val }), powerScores.storage, "storage", "300")}
-                        {renderSelect("Материнская плата", pc2.motherboard, (val) => setPc2({ ...pc2, motherboard: val }), powerScores.motherboard, "motherboard", "400")}
-                        {renderSelect("Блок питания", pc2.psu, (val) => setPc2({ ...pc2, psu: val }), powerScores.psu, "psu", "500")}
+                        {renderSelect("Видеокарта", pc2.gpu, (val) => setPc2({ ...pc2, gpu: val }), powerScores.gpu, "gpu")}
+                        {renderSelect("RAM", pc2.ram, (val) => setPc2({ ...pc2, ram: val }), powerScores.ram, "ram")}
+                        {renderSelect("Накопитель", pc2.storage, (val) => setPc2({ ...pc2, storage: val }), powerScores.storage, "storage")}
+                        {renderSelect("Материнская плата", pc2.motherboard, (val) => setPc2({ ...pc2, motherboard: val }), powerScores.motherboard, "motherboard")}
+                        {renderSelect("Блок питания", pc2.psu, (val) => setPc2({ ...pc2, psu: val }), powerScores.psu, "psu")}
                     </div>
                 </div>
             </div>
 
-            <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8" data-aos="fade-up" data-aos-delay="300">
-                <div className="flex-1 bg-white rounded-2xl shadow-lg p-6">
-                    <h4 className="text-xl font-semibold text-gray-800 mb-3">Сборка ПК 1</h4>
+            <div className="w-full max-w-6xl flex flex-col lg:flex-row gap-6">
+                <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 flex-1">
+                    <h4 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3">Сборка ПК 1</h4>
                     {getComponentSummary(pc1).length > 0 ? (
-                        <ul className="list-disc list-inside text-gray-700 text-sm">
+                        <ul className="list-disc list-inside text-gray-700 text-xs sm:text-sm">
                             {getComponentSummary(pc1).map((item, index) => (
                                 <li key={index}>{item}</li>
                             ))}
                         </ul>
                     ) : (
-                        <p className="text-gray-600 text-sm">Компоненты не выбраны</p>
+                        <p className="text-gray-600 text-xs sm:text-sm">Компоненты не выбраны</p>
                     )}
                 </div>
-                <div className="flex-1 bg-white rounded-2xl shadow-lg p-6">
-                    <h4 className="text-xl font-semibold text-gray-800 mb-3">Сборка ПК 2</h4>
+                <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 flex-1">
+                    <h4 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3">Сборка ПК 2</h4>
                     {getComponentSummary(pc2).length > 0 ? (
-                        <ul className="list-disc list-inside text-gray-700 text-sm">
+                        <ul className="list-disc list-inside text-gray-700 text-xs sm:text-sm">
                             {getComponentSummary(pc2).map((item, index) => (
                                 <li key={index}>{item}</li>
                             ))}
                         </ul>
                     ) : (
-                        <p className="text-gray-600 text-sm">Компоненты не выбраны</p>
+                        <p className="text-gray-600 text-xs sm:text-sm">Компоненты не выбраны</p>
                     )}
                 </div>
             </div>
 
             <button
                 onClick={handleCompare}
-                className="px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xl font-semibold rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300"
-                data-aos="zoom-in"
-                data-aos-delay="400"
+                className="px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-base sm:text-xl font-semibold rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300"
             >
                 Сравнить
             </button>
 
             {result && (
-                <div className="w-full max-w-4xl space-y-8" data-aos="fade-up" data-aos-delay="500">
-                    <div className="bg-white rounded-2xl shadow-lg p-6">
-                        <h4 className="text-2xl font-semibold text-gray-800 mb-2">Компьютер 1: {result.pc1Power}</h4>
-                        <div className="w-full bg-gray-200 rounded-full h-8 overflow-hidden">
+                <div className="w-full max-w-6xl space-y-6">
+                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+                        <h4 className="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">Компьютер 1: {result.pc1Power}</h4>
+                        <div className="w-full bg-gray-200 rounded-full h-6 sm:h-8 overflow-hidden">
                             <div
-                                className="bg-gradient-to-r from-blue-500 to-indigo-600 h-8 text-white text-center flex items-center justify-center transition-all duration-1000"
+                                className="bg-gradient-to-r from-blue-500 to-indigo-600 h-6 sm:h-8 text-white text-center flex items-center justify-center transition-all duration-1000 text-xs sm:text-base"
                                 style={{ width: `${Math.min((result.pc1Power / 600) * 100, 100)}%` }}
                             >
                                 {result.pc1Power}
                             </div>
                         </div>
                     </div>
-                    <div className="bg-white rounded-2xl shadow-lg p-6">
-                        <h4 className="text-2xl font-semibold text-gray-800 mb-2">Компьютер 2: {result.pc2Power}</h4>
-                        <div className="w-full bg-gray-200 rounded-full h-8 overflow-hidden">
+                    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+                        <h4 className="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">Компьютер 2: {result.pc2Power}</h4>
+                        <div className="w-full bg-gray-200 rounded-full h-6 sm:h-8 overflow-hidden">
                             <div
-                                className="bg-gradient-to-r from-blue-500 to-indigo-600 h-8 text-white text-center flex items-center justify-center transition-all duration-1000"
+                                className="bg-gradient-to-r from-blue-500 to-indigo-600 h-6 sm:h-8 text-white text-center flex items-center justify-center transition-all duration-1000 text-xs sm:text-base"
                                 style={{ width: `${Math.min((result.pc2Power / 600) * 100, 100)}%` }}
                             >
                                 {result.pc2Power}
