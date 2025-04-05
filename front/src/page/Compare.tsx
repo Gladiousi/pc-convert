@@ -3,7 +3,7 @@ import { useTabStore } from "../store/useTabStore";
 import { powerScores, PCConfig, checkCompatibility, calculatePower } from "../data/pcData";
 
 const Compare: React.FC = () => {
-    const { token, setToken, setActiveTab } = useTabStore();
+    const { token, role, setToken, setActiveTab } = useTabStore();
     const [pc1, setPc1] = useState<PCConfig>({ cpu: "", gpu: "", ram: "", storage: "", motherboard: "", psu: "" });
     const [pc2, setPc2] = useState<PCConfig>({ cpu: "", gpu: "", ram: "", storage: "", motherboard: "", psu: "" });
     const [result, setResult] = useState<{ pc1Power: number; pc2Power: number } | null>(null);
@@ -15,13 +15,14 @@ const Compare: React.FC = () => {
                 headers: { Authorization: `Bearer ${token}` },
             }).then((res) => {
                 if (!res.ok) {
+                    setToken(null);
                     setActiveTab("home");
                 }
             });
         } else {
-            setActiveTab("home"); 
+            setActiveTab("home");
         }
-    }, [token, setActiveTab]);
+    }, [token, setToken, setActiveTab]);
 
     const handleCompare = () => {
         setErrors([]);
@@ -41,9 +42,8 @@ const Compare: React.FC = () => {
     };
 
     const handleLogout = () => {
-        setToken(null); 
-        localStorage.removeItem("token"); 
-        setActiveTab("home"); 
+        setToken(null);
+        setActiveTab("home");
     };
 
     const getComponentInfo = (type: keyof typeof powerScores, value: string): string => {
@@ -51,21 +51,15 @@ const Compare: React.FC = () => {
         const component = powerScores[type][value as keyof typeof powerScores[typeof type]];
 
         switch (type) {
-            case "cpu":
-                return `Сокет: ${(component as typeof powerScores.cpu[string]).socket}`;
-            case "gpu":
-                return `Разъём: ${(component as typeof powerScores.gpu[string]).connector}`;
-            case "ram":
-                return `Тип: ${(component as typeof powerScores.ram[string]).type}`;
-            case "storage":
-                return `Интерфейс: ${(component as typeof powerScores.storage[string]).interface}`;
+            case "cpu": return `Сокет: ${(component as typeof powerScores.cpu[string]).socket}`;
+            case "gpu": return `Разъём: ${(component as typeof powerScores.gpu[string]).connector}`;
+            case "ram": return `Тип: ${(component as typeof powerScores.ram[string]).type}`;
+            case "storage": return `Интерфейс: ${(component as typeof powerScores.storage[string]).interface}`;
             case "motherboard":
                 const mb = component as typeof powerScores.motherboard[string];
                 return `Сокет: ${mb.socket}, RAM: ${mb.ramType}, GPU: ${mb.gpuConnector}, Накопители: ${mb.storageInterface.join(", ")}`;
-            case "psu":
-                return `Мощность: ${value}`;
-            default:
-                return "";
+            case "psu": return `Мощность: ${value}`;
+            default: return "";
         }
     };
 
@@ -83,7 +77,7 @@ const Compare: React.FC = () => {
     const renderSelect = (
         label: string,
         value: string,
-        onChange: (value: string) => void,
+        onChange: (value: | string) => void,
         options: Record<string, any>,
         type: keyof typeof powerScores,
         aosDelay?: string
@@ -113,8 +107,16 @@ const Compare: React.FC = () => {
     );
 
     return (
-        <div className="w-full min-h-[80dvh] flex flex-col justify-center items-center space-y-10 p-6 relative">
+        <div className="w-full min-h-[80dvh] flex flex-col justify-center items-center space-y-10 p-6 bg-gray-50">
             <div className="absolute top-4 right-4 flex items-center space-x-4">
+                {role === "ADMIN" && (
+                    <button
+                        onClick={() => setActiveTab("admin")}
+                        className="px-4 py-2 bg-indigo-500 text-white rounded-lg shadow-md hover:bg-indigo-600 transition-all duration-300"
+                    >
+                        Админка
+                    </button>
+                )}
                 <button
                     onClick={handleLogout}
                     className="px-4 py-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition-all duration-300"
@@ -141,10 +143,7 @@ const Compare: React.FC = () => {
             )}
 
             <div className="flex flex-col md:flex-row justify-center gap-8 w-full max-w-6xl">
-                <div
-                    className="flex-1 bg-white rounded-2xl shadow-lg p-6 transform hover:scale-105 transition-transform duration-300"
-                    data-aos="fade-up"
-                >
+                <div className="flex-1 bg-white rounded-2xl shadow-lg p-6 transform hover:scale-105 transition-transform duration-300" data-aos="fade-up">
                     <h3 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Компьютер 1</h3>
                     <div className="space-y-4">
                         {renderSelect("Процессор", pc1.cpu, (val) => setPc1({ ...pc1, cpu: val }), powerScores.cpu, "cpu")}
@@ -156,11 +155,7 @@ const Compare: React.FC = () => {
                     </div>
                 </div>
 
-                <div
-                    className="flex-1 bg-white rounded-2xl shadow-lg p-6 transform hover:scale-105 transition-transform duration-300"
-                    data-aos="fade-up"
-                    data-aos-delay="200"
-                >
+                <div className="flex-1 bg-white rounded-2xl shadow-lg p-6 transform hover:scale-105 transition-transform duration-300" data-aos="fade-up" data-aos-delay="200">
                     <h3 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Компьютер 2</h3>
                     <div className="space-y-4">
                         {renderSelect("Процессор", pc2.cpu, (val) => setPc2({ ...pc2, cpu: val }), powerScores.cpu, "cpu")}

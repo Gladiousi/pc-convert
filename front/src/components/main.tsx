@@ -5,6 +5,7 @@ import Compare from "../page/Compare";
 import View from "../page/View";
 import About from "../page/About";
 import Auth from "../components/Auth";
+import Admin from "../page/Admin";
 
 const Main = () => {
     const { activeTab, setActiveTab, token } = useTabStore();
@@ -34,9 +35,12 @@ const Main = () => {
                         >
                             Войдите или зарегистрируйтесь, чтобы сравнить компьютеры.
                         </p>
-                        <div data-aos="fade-up" data-aos-delay="300">
-                            <Auth />
-                        </div>
+                        <button
+                            onClick={() => setActiveTab("auth")}
+                            className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-all duration-300"
+                        >
+                            Вход
+                        </button>
                     </div>
                 );
             }
@@ -44,6 +48,8 @@ const Main = () => {
         }
         if (activeTab === "view") return <View />;
         if (activeTab === "about") return <About />;
+        if (activeTab === "admin") return <Admin />;
+        if (activeTab === "auth") return <Auth />;
     };
 
     return (

@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 
 interface AuthRequest extends Request {
-    user?: { userId: number };
+    user?: { userId: number, role: string };
 }
 
 const app = express();
@@ -36,7 +36,7 @@ const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) 
             res.status(403).json({ error: "Invalid token" });
             return;
         }
-        req.user = decoded as { userId: number };
+        req.user = decoded as { userId: number, role: string };
         next();
     });
 };
@@ -56,6 +56,7 @@ app.post(
                 data: {
                     email,
                     password: hashedPassword,
+                    role: "USER",
                 },
             });
             res.status(201).json({ message: "User created", userId: user.id });
@@ -79,7 +80,7 @@ app.post(
             return res.status(401).json({ error: "Invalid credentials" });
         }
 
-        const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
+        const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: "24h" });
         res.json({ token });
     })
 );
@@ -87,6 +88,16 @@ app.post(
 app.get("/compare", authenticateToken, (req: AuthRequest, res: Response) => {
     res.json({ message: "This is a protected route", user: req.user });
 });
+
+app.get("/admin/users", authenticateToken, asyncHandler(async (req: AuthRequest, res: Response) => {
+    if (req.user?.role !== "ADMIN") {
+        return res.status(403).json({ error: "Доступ только для администраторов" });
+    }
+    const users = await prisma.user.findMany({
+        select: { id: true, email: true, role: true, createdAt: true },
+    });
+    res.json(users);
+}));
 
 app.use((err: Error, req: AuthRequest, res: Response, next: NextFunction) => {
     console.error(err.stack);

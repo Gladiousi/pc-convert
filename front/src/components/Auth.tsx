@@ -1,104 +1,89 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { useTabStore } from "../store/useTabStore";
 
 const Auth: React.FC = () => {
+    const { setToken, setActiveTab } = useTabStore();
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const { setToken, setActiveTab } = useTabStore();
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
 
         const url = isLogin ? "http://localhost:5000/login" : "http://localhost:5000/register";
         try {
-            const response = await fetch(url, {
+            const res = await fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             });
+            const data = await res.json();
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || "Something went wrong!");
+            if (!res.ok) {
+                throw new Error(data.error || "Ошибка");
             }
 
             if (isLogin) {
                 setToken(data.token);
-                localStorage.setItem("token", data.token);
                 setActiveTab("compare");
             } else {
-                setError("Регистрация успешна! Теперь войдите.");
                 setIsLogin(true);
             }
-
-            setEmail("");
-            setPassword("");
         } catch (err: any) {
             setError(err.message);
         }
     };
 
     return (
-        <div className="w-full min-h-[60dvh] flex justify-center items-center p-6">
-            <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
-                <h1 data-aos="fade-down" className="text-3xl font-light text-gray-800 mb-6 text-center">
-                    {isLogin ? "Вход" : "Регистрация"}
-                </h1>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div data-aos="fade-up">
-                        <label className="block text-sm font-medium text-gray-700">Email</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full p-3 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                            placeholder="Введите ваш email"
-                            required
-                        />
-                    </div>
-                    <div data-aos="fade-up" data-aos-delay="100">
-                        <label className="block text-sm font-medium text-gray-700">Пароль</label>
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="w-full p-3 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                            placeholder="Введите ваш пароль"
-                            required
-                        />
-                    </div>
-                    {error && (
-                        <p data-aos="fade-up" className="text-red-600 text-sm text-center">
-                            {error}
-                        </p>
-                    )}
-                    <button
-                        type="submit"
-                        className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 transition-all duration-300"
-                        data-aos="zoom-in"
-                        data-aos-delay="200"
-                    >
-                        {isLogin ? "Войти" : "Зарегистрироваться"}
-                    </button>
-                </form>
+        <div className="w-full min-h-[80dvh] flex flex-col justify-center items-center p-6 bg-gray-50">
+            <h1
+                data-aos="fade-down"
+                className="text-5xl font-light text-gray-800 mb-8"
+            >
+                {isLogin ? "Вход" : "Регистрация"}
+            </h1>
+            <form
+                onSubmit={handleSubmit}
+                className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 space-y-6 transform hover:scale-105 transition-transform duration-300"
+            >
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Email</label>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        required
+                    />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Пароль</label>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        required
+                    />
+                </div>
+                {error && (
+                    <p className="text-red-500 text-sm text-center">{error}</p>
+                )}
+                <button
+                    type="submit"
+                    className="w-full px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xl font-semibold rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300"
+                >
+                    {isLogin ? "Войти" : "Зарегистрироваться"}
+                </button>
                 <p
-                    className="mt-4 text-center text-gray-600 cursor-pointer hover:text-blue-500 transition"
-                    onClick={() => {
-                        setIsLogin(!isLogin);
-                        setError("");
-                        setEmail("");
-                        setPassword("");
-                    }}
-                    data-aos="fade-up"
-                    data-aos-delay="300"
+                    className="text-center text-gray-600 cursor-pointer hover:text-blue-500 transition"
+                    onClick={() => setIsLogin(!isLogin)}
                 >
                     {isLogin ? "Нет аккаунта? Зарегистрируйтесь" : "Уже есть аккаунт? Войдите"}
                 </p>
-            </div>
+            </form>
         </div>
     );
 };
