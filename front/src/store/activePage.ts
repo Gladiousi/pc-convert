@@ -1,11 +1,5 @@
 import { create } from "zustand";
-
-type Page = "home" | "compare" | "view" | "about";
-
-interface PageState {
-  activePage: Page;
-  setActivePage: (page: Page) => void;
-}
+import { PageState } from "../interface/store";
 
 export const usePageStore = create<PageState>((set) => ({
   activePage: "home",
