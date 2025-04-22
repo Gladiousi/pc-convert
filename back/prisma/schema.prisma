@@ -14,3 +14,18 @@ model User {
   role      String   @default("USER") 
   createdAt DateTime @default(now())
 }
+
+model Component {
+  id              Int      @id @default(autoincrement())
+  name            String   @unique
+  type            String
+  power           Int
+  socket          String
+  connector       String
+  ramType         String
+  interface       String
+  storageInterfaces String[]
+  gpuConnector    String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
