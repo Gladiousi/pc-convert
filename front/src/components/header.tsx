@@ -16,6 +16,7 @@ const Header = () => {
         { id: "compare", label: "Сравнение" },
         { id: "view", label: "Просмотр" },
         { id: "about", label: "О нас" },
+        { id: "assemble", label: "Сборка"}
     ];
 
     return (

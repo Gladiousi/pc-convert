@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useTabStore } from "../store/useTabStore";
 import Home from "../page/Home";
 import Compare from "../page/Compare";
+import Assemble from "../page/Assemble";
 import View from "../page/View";
 import About from "../page/About";
 import Auth from "../components/Auth";
@@ -18,7 +19,7 @@ const Main = () => {
     const isAuthenticated = !!token;
     const renderContent = () => {
         if (activeTab === "home") return <Home />;
-        if (activeTab === "compare") {
+        if (activeTab === "compare" || activeTab === "assemble") {
             if (!isAuthenticated) {
                 return (
                     <div className="text-center min-h-[60dvh] flex flex-col justify-center items-center space-y-6">
@@ -33,7 +34,7 @@ const Main = () => {
                             data-aos-delay="200"
                             className="text-lg text-gray-600 max-w-md"
                         >
-                            Войдите или зарегистрируйтесь, чтобы сравнить компьютеры.
+                            Войдите или зарегистрируйтесь, чтобы {activeTab === "compare" ? "сравнить компьютеры" : "собрать ПК"}.
                         </p>
                         <button
                             onClick={() => setActiveTab("auth")}
@@ -44,7 +45,7 @@ const Main = () => {
                     </div>
                 );
             }
-            return <Compare />;
+            return activeTab === "compare" ? <Compare /> : <Assemble />;
         }
         if (activeTab === "view") return <View />;
         if (activeTab === "about") return <About />;

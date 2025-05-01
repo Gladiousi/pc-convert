@@ -6,15 +6,13 @@ import PCConfigForm from "../components/compare/PCConfigForm";
 import ConfigResult from "../components/compare/ConfigResult";
 import { PCConfig } from "../interface/pc";
 
-const Compare: React.FC = () => {
+const Assemble: React.FC = () => {
   const { token, setToken, setActiveTab, powerScores, setPowerScores } = useTabStore();
-  const [pc1, setPc1] = useState<PCConfig>({ cpu: "", gpu: "", ram: "", storage: "", motherboard: "", psu: "" });
-  const [pc2, setPc2] = useState<PCConfig>({ cpu: "", gpu: "", ram: "", storage: "", motherboard: "", psu: "" });
-  const [result, setResult] = useState<{ pc1Power: number; pc2Power: number } | null>(null);
+  const [pc, setPc] = useState<PCConfig>({ cpu: "", gpu: "", ram: "", storage: "", motherboard: "", psu: "" });
   const [errors, setErrors] = useState<string[]>([]);
   const [sockets, setSockets] = useState<string[]>([]);
-  const [pc1Socket, setPc1Socket] = useState<string>("");
-  const [pc2Socket, setPc2Socket] = useState<string>("");
+  const [socket, setSocket] = useState<string>("");
+  const [power, setPower] = useState<number | null>(null);
 
   useEffect(() => {
     if (token) {
@@ -58,31 +56,29 @@ const Compare: React.FC = () => {
     }
   };
 
-  const handleCompare = () => {
+  const handleAssemble = () => {
     if (!powerScores) {
       setErrors(["Данные о комплектующих не загружены"]);
       return;
     }
     setErrors([]);
-    setResult(null);
-    const pc1Errors = checkCompatibility(pc1, powerScores);
-    const pc2Errors = checkCompatibility(pc2, powerScores);
-    if (pc1Errors.length > 0 || pc2Errors.length > 0) {
-      setErrors([...pc1Errors.map((e) => `ПК 1: ${e}`), ...pc2Errors.map((e) => `ПК 2: ${e}`)]);
+    setPower(null);
+    const pcErrors = checkCompatibility(pc, powerScores);
+    if (pcErrors.length > 0) {
+      setErrors(pcErrors);
       return;
     }
-    const pc1Power = calculatePower(pc1, powerScores);
-    const pc2Power = calculatePower(pc2, powerScores);
-    setResult({ pc1Power, pc2Power });
+    const pcPower = calculatePower(pc, powerScores);
+    setPower(pcPower);
   };
 
   return (
     <div className="w-full min-h-[80dvh] flex flex-col justify-center items-center space-y-8 p-4 sm:p-6 bg-gray-50 relative">
       <h1 className="text-3xl sm:text-4xl md:text-5xl font-light text-gray-800 text-center">
-        Сравнение компьютеров
+        Сборка ПК
       </h1>
       <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl text-center">
-        Соберите два компьютера, учитывая совместимость комплектующих, и сравните их мощность!
+        Соберите свой компьютер, учитывая совместимость комплектующих, и узнайте его мощность!
       </p>
 
       {errors.length > 0 && (
@@ -96,46 +92,32 @@ const Compare: React.FC = () => {
       )}
 
       {powerScores ? (
-        <div className="flex flex-col lg:flex-row gap-6 w-full max-w-6xl">
-          <div className="flex-1">
-            <SocketSelector
-              socket={pc1Socket}
-              setSocket={(val) => {
-                setPc1Socket(val);
-                setPc1({ ...pc1, cpu: "", motherboard: "" });
-              }}
-              sockets={sockets}
-              label="Сокет ПК 1"
-            />
-            <PCConfigForm pc={pc1} setPc={setPc1} powerScores={powerScores} socket={pc1Socket} label="Компьютер 1" />
-          </div>
-          <div className="flex-1">
-            <SocketSelector
-              socket={pc2Socket}
-              setSocket={(val) => {
-                setPc2Socket(val);
-                setPc2({ ...pc2, cpu: "", motherboard: "" });
-              }}
-              sockets={sockets}
-              label="Сокет ПК 2"
-            />
-            <PCConfigForm pc={pc2} setPc={setPc2} powerScores={powerScores} socket={pc2Socket} label="Компьютер 2" />
-          </div>
+        <div className="w-full max-w-3xl">
+          <SocketSelector
+            socket={socket}
+            setSocket={(val) => {
+              setSocket(val);
+              setPc({ ...pc, cpu: "", motherboard: "" });
+            }}
+            sockets={sockets}
+            label="Сокет"
+          />
+          <PCConfigForm pc={pc} setPc={setPc} powerScores={powerScores} socket={socket} label="Ваш ПК" />
         </div>
       ) : (
         <div className="text-gray-600 text-center">Загрузка комплектующих...</div>
       )}
 
       <button
-        onClick={handleCompare}
+        onClick={handleAssemble}
         className="px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-base sm:text-xl font-semibold rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300"
       >
-        Сравнить
+        Рассчитать мощность
       </button>
 
-      <ConfigResult pc1={pc1} pc2={pc2} result={result} powerScores={powerScores} />
+      <ConfigResult pc1={pc} pc2={null} result={power ? { pc1Power: power, pc2Power: 0 } : null} powerScores={powerScores} />
     </div>
   );
 };
 
-export default Compare;
+export default Assemble;
