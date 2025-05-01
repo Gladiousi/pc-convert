@@ -35,11 +35,11 @@ const Admin: React.FC = () => {
   }, [token, setActiveTab, tab]);
 
   return (
-    <div className="text-black w-full min-h-[80dvh] flex flex-col justify-center items-center p-4 sm:p-6 bg-gray-50">
-      <h1 className="text-3xl sm:text-4xl md:text-5xl font-light text-gray-800 mb-6 sm:mb-8">
+    <div className="w-full min-h-[80dvh] flex flex-col justify-center items-center p-4 sm:p-6 lg:p-8 bg-gray-50">
+      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-gray-800 mb-4 sm:mb-6 lg:mb-8">
         Админка
       </h1>
-      <div className="w-full max-w-4xl bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+      <div className="w-full max-w-3xl sm:max-w-4xl bg-white rounded-2xl shadow-lg p-4 sm:p-6">
         <TabSelector activeTab={tab} setTab={setTab} />
         {tab === "users" ? (
           <UserManagement users={users} loading={loading} />

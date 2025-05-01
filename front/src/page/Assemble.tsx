@@ -73,16 +73,16 @@ const Assemble: React.FC = () => {
   };
 
   return (
-    <div className="w-full min-h-[80dvh] flex flex-col justify-center items-center space-y-8 p-4 sm:p-6 bg-gray-50 relative">
-      <h1 className="text-3xl sm:text-4xl md:text-5xl font-light text-gray-800 text-center">
+    <div className="w-full min-h-[80dvh] flex flex-col justify-center items-center space-y-6 p-4 sm:p-6 lg:p-8 bg-gray-50">
+      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-gray-800 text-center">
         Сборка ПК
       </h1>
-      <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl text-center">
+      <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl text-center">
         Соберите свой компьютер, учитывая совместимость комплектующих, и узнайте его мощность!
       </p>
 
       {errors.length > 0 && (
-        <div className="sticky top-10 w-64 sm:w-80 bg-red-100 border border-red-400 text-red-700 p-4 rounded-lg shadow-lg z-20">
+        <div className="w-full max-w-md bg-red-100 border border-red-400 text-red-700 p-3 sm:p-4 rounded-lg shadow-lg z-20">
           <ul className="list-disc list-inside text-xs sm:text-sm">
             {errors.map((error, index) => (
               <li key={index}>{error}</li>
@@ -105,12 +105,12 @@ const Assemble: React.FC = () => {
           <PCConfigForm pc={pc} setPc={setPc} powerScores={powerScores} socket={socket} label="Ваш ПК" />
         </div>
       ) : (
-        <div className="text-gray-600 text-center">Загрузка комплектующих...</div>
+        <div className="text-gray-600 text-sm sm:text-base text-center">Загрузка комплектующих...</div>
       )}
 
       <button
         onClick={handleAssemble}
-        className="px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-base sm:text-xl font-semibold rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300"
+        className="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm sm:text-base md:text-lg font-semibold rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 min-w-[120px]"
       >
         Рассчитать мощность
       </button>

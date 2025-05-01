@@ -27,7 +27,7 @@ const Header = () => {
             >
                 <h1 className="text-2xl font-semibold text-gray-800">PC Compare</h1>
 
-                <div className="hidden md:flex space-x-6">
+                <div className="hidden lg:flex space-x-6">
                     {navItems.map((item) => (
                         <button
                             key={item.id}
@@ -46,7 +46,7 @@ const Header = () => {
                     ))}
                 </div>
 
-                <div className="hidden md:flex items-center space-x-4">
+                <div className="hidden lg:flex items-center space-x-4">
                     {token ? (
                         <>
                             {role === "ADMIN" && (
@@ -75,7 +75,7 @@ const Header = () => {
                 </div>
 
                 <button
-                    className="md:hidden text-gray-700 focus:outline-none"
+                    className="lg:hidden text-gray-700 focus:outline-none"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,7 +90,7 @@ const Header = () => {
             </nav>
 
             {isMenuOpen && (
-                <div className="md:hidden absolute w-full bg-white shadow-md px-6 py-4 space-y-4">
+                <div className="lg:hidden absolute w-full bg-white shadow-md px-6 py-4 space-y-4">
                     {navItems.map((item) => (
                         <button
                             key={item.id}
