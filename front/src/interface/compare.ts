@@ -2,7 +2,7 @@ import { PCConfig, PowerScores } from "./pc";
 
 interface ComparisonResultProps {
     pc1: PCConfig;
-    pc2: PCConfig;
+    pc2: PCConfig | null;
     result: { pc1Power: number; pc2Power: number } | null;
     powerScores: PowerScores | null;
 }

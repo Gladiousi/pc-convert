@@ -14,9 +14,9 @@ const Header = () => {
     const navItems = [
         { id: "home", label: "Главная" },
         { id: "compare", label: "Сравнение" },
-        { id: "view", label: "Просмотр" },
+        { id: "assemble", label: "Собрать"},
+        { id: "view", label: "Сборки" },
         { id: "about", label: "О нас" },
-        { id: "assemble", label: "Сборка"}
     ];
 
     return (

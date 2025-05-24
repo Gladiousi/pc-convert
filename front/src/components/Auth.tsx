@@ -39,14 +39,13 @@ const Auth: React.FC = () => {
     return (
         <div className="w-full min-h-[80dvh] flex flex-col justify-center items-center p-4 sm:p-6 bg-gray-50">
             <h1
-                data-aos="fade-down"
                 className="text-3xl sm:text-4xl md:text-5xl font-light text-gray-800 mb-6 sm:mb-8"
             >
                 {isLogin ? "Вход" : "Регистрация"}
             </h1>
             <form
                 onSubmit={handleSubmit}
-                className="w-full max-w-xs sm:max-w-sm md:max-w-md bg-white rounded-2xl shadow-lg p-6 sm:p-8 space-y-4 sm:space-y-6 transform hover:scale-105 transition-transform duration-300"
+                className="w-full max-w-xs sm:max-w-sm md:max-w-md bg-white rounded-2xl shadow-lg p-6 sm:p-8 space-y-4 sm:space-y-6 "
             >
                 <div className="space-y-2">
                     <label className="text-xs sm:text-sm font-medium text-gray-700">Email</label>

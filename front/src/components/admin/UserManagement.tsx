@@ -1,6 +1,7 @@
 import { UserManagementProps } from "../../interface/admin";
 
 const UserManagement: React.FC<UserManagementProps> = ({ users, loading }) => {
+    
     if (loading) {
         return (
             <div className="w-full min-h-[80dvh] flex justify-center items-center">

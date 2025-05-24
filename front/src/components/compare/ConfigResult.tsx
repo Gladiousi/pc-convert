@@ -1,13 +1,7 @@
+import { ComparisonResultProps } from "../../interface/compare";
 import { PCConfig, PowerScores } from "../../interface/pc";
 
-interface ConfigResultProps {
-  pc1: PCConfig;
-  pc2: PCConfig | null;
-  result: { pc1Power: number; pc2Power: number } | null;
-  powerScores: PowerScores | null;
-}
-
-const ConfigResult: React.FC<ConfigResultProps> = ({ pc1, pc2, result, powerScores }) => {
+const ConfigResult: React.FC<ComparisonResultProps> = ({ pc1, pc2, result, powerScores }) => {
   const getComponentInfo = (type: keyof PowerScores, value: string): string => {
     if (!value || !powerScores) return "";
     const component = powerScores[type][value];

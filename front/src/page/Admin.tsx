@@ -39,7 +39,7 @@ const Admin: React.FC = () => {
       <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-gray-800 mb-4 sm:mb-6 lg:mb-8">
         Админка
       </h1>
-      <div className="w-full max-w-3xl sm:max-w-4xl bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+      <div className="w-full text-black max-w-3xl sm:max-w-4xl bg-white rounded-2xl shadow-lg p-4 sm:p-6">
         <TabSelector activeTab={tab} setTab={setTab} />
         {tab === "users" ? (
           <UserManagement users={users} loading={loading} />
