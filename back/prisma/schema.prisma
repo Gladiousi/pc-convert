@@ -16,16 +16,16 @@ model User {
 }
 
 model Component {
-  id              Int      @id @default(autoincrement())
-  name            String   @unique
-  type            String
-  power           Int
-  socket          String
-  connector       String
-  ramType         String
-  interface       String
-  storageInterfaces String[]
-  gpuConnector    String
+  id                Int      @id @default(autoincrement())
+  name              String
+  type              String
+  power             Int
+  socket            String?
+  connector         String?
+  ramType           String?
+  interface         String?
+  storageInterfaces String[] @default([])
+  gpuConnector      String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

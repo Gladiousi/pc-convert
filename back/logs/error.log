@@ -1,0 +1,7 @@
+{"level":"error","message":"Redis connection error: ","timestamp":"2025-05-24T10:50:00.572Z"}
+{"level":"error","message":"Redis connection error: ","timestamp":"2025-05-24T10:50:18.337Z"}
+{"level":"error","message":"Redis connection error: ","timestamp":"2025-05-24T10:52:03.510Z"}
+{"level":"error","message":"Redis connection error: AggregateError","redisUrl":"redis://localhost:6379","stack":"AggregateError\n    at internalConnectMultiple (node:net:1114:18)\n    at afterConnectMultiple (node:net:1667:5)","timestamp":"2025-05-24T10:53:58.955Z"}
+{"level":"error","message":"Redis connection error: AggregateError","redisUrl":"redis://localhost:6379","stack":"AggregateError\n    at internalConnectMultiple (node:net:1114:18)\n    at afterConnectMultiple (node:net:1667:5)","timestamp":"2025-05-24T10:54:22.949Z"}
+{"level":"error","message":"Redis connection error: AggregateError","redisUrl":"redis://localhost:6379","stack":"AggregateError\n    at internalConnectMultiple (node:net:1114:18)\n    at afterConnectMultiple (node:net:1667:5)","timestamp":"2025-05-24T11:00:15.658Z"}
+{"level":"error","message":"Redis connection error: AggregateError","redisUrl":"redis://localhost:6379","stack":"AggregateError\n    at internalConnectMultiple (node:net:1114:18)\n    at afterConnectMultiple (node:net:1667:5)","timestamp":"2025-05-24T11:06:06.036Z"}
