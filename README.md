@@ -26,23 +26,46 @@ Frontend построен на **React**, **TypeScript** и **Vite**, с исп�
  ┣ 📂components
  ┃ ┣ 📂admin
  ┃ ┃ ┣ 📜ComponentForm.tsx
- ┃ ┃ ┣ 📜UserManagement.tsx
+ ┃ ┃ ┣ 📜TabSelector.tsx
+ ┃ ┃ ┗ 📜UserManagement.tsx
+ ┃ ┣ 📂common
+ ┃ ┃ ┣ 📜Alert.tsx
+ ┃ ┃ ┣ 📜Card.tsx
+ ┃ ┃ ┣ 📜ErrorList.tsx
+ ┃ ┃ ┣ 📜GradientButton.tsx
+ ┃ ┃ ┣ 📜PageContainer.tsx
+ ┃ ┃ ┣ 📜SectionHeading.tsx
+ ┃ ┃ ┣ 📜Select.tsx
  ┃ ┃ ┗ 📜TabSelector.tsx
  ┃ ┣ 📂compare
+ ┃ ┃ ┣ 📜ConfigResult.tsx
  ┃ ┃ ┣ 📜PCConfigForm.tsx
- ┃ ┃ ┣ 📜ComparisonResult.tsx
  ┃ ┃ ┗ 📜SocketSelector.tsx
  ┃ ┣ 📜Auth.tsx
- ┃ ┣ 📜faq.tsx
- ┃ ┣ 📜footer.tsx
- ┃ ┗ 📜header.tsx
+ ┃ ┣ 📜Faq.tsx
+ ┃ ┣ 📜Footer.tsx
+ ┃ ┗ 📜Header.tsx
  ┣ 📂data
  ┃ ┣ 📜faq.ts
  ┃ ┣ 📜pc.ts
  ┃ ┗ 📜pcData.ts
+ ┣ 📂hooks
+ ┃ ┣ 📜useApi.ts
+ ┃ ┣ 📜useComponentData.ts
+ ┃ ┣ 📜useComponentOptions.ts
+ ┃ ┗ 📜useForm.ts
+ ┣ 📂interface
+ ┃ ┣ 📜admin.ts
+ ┃ ┣ 📜common.ts
+ ┃ ┣ 📜compare.ts
+ ┃ ┣ 📜hooks.ts
+ ┃ ┣ 📜page.ts
+ ┃ ┣ 📜pc.ts
+ ┃ ┗ 📜store.ts
  ┣ 📂page
  ┃ ┣ 📜About.tsx
  ┃ ┣ 📜Admin.tsx
+ ┃ ┣ 📜Assemble.tsx
  ┃ ┣ 📜Compare.tsx
  ┃ ┣ 📜Home.tsx
  ┃ ┗ 📜View.tsx
@@ -51,6 +74,9 @@ Frontend построен на **React**, **TypeScript** и **Vite**, с исп�
  ┣ 📂store
  ┃ ┣ 📜activePage.ts
  ┃ ┗ 📜useTabStore.ts
+ ┣ 📂utils
+ ┃ ┣ 📜option.ts
+ ┃ ┗ 📜page.ts
  ┣ 📜App.tsx
  ┣ 📜index.css
  ┣ 📜main.tsx
@@ -80,7 +106,17 @@ cd pc-configurator
 
 ### 2. Установка зависимостей
 
+Установка зависимотей для frontend
+
 ```bash
+cd front
+npm install
+```
+
+Установка зависимостей для backend
+
+```bash
+cd back
 npm install
 ```
 
@@ -119,8 +155,6 @@ npx prisma studio
 Запустите backend-сервер (предполагается, что backend находится в отдельной директории):
 
 ```bash
-cd ../backend
-npm install
 npm run start
 ```
 
@@ -153,13 +187,17 @@ npm run preview
 1. **Главная страница**: Ознакомьтесь с приложением и перейдите на другие страницы.
 2. **Страница сравнения**:
    - Войдите или зарегистрируйтесь для доступа.
-   - Выберите сокет для каждого ПК, подберите комплектующие и нажмите "Сравнить" для оценки мощности.
+   - Выберите сокет для каждого ПК или же настройте комплектующие сами, подберите комплектующие и нажмите "Сравнить" для оценки производительности ПК.
    - Проверка совместимости гарантирует корректные конфигурации (например, совпадение сокетов процессора и материнской платы).
-3. **Панель администратора**:
+3. **Страница конфигурации ПК**:
+  - Войдите или зарегистрируйтесь для доступа.
+  - Выберите сокет для ПК или же настройте комплектующие сами и нажмите "Рассчитать мощность" для оценки производительности ПК.
+  - Проверка совместимости гарантирует корректные конфигурации (например, совпадение сокетов процессора и материнской платы).
+4. **Панель администратора**:
    - Доступна для пользователей с ролью `ADMIN`.
    - Просматривайте и управляйте пользователями или добавляйте новые комплектующие через форму с выпадающими списками.
-4. **Страница "О проекте"**: Узнайте больше о приложении.
-5. **Страница авторизации**: Войдите или зарегистрируйтесь для доступа к защищённым функциям.
+5. **Страница "О проекте"**: Узнайте больше о приложении.
+6. **Страница авторизации**: Войдите или зарегистрируйтесь для доступа к защищённым функциям.
 
 ## Настройка ESLint
 
