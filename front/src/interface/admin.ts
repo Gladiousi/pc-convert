@@ -2,12 +2,12 @@ interface Component {
     name: string;
     type: string;
     power: number;
-    socket?: string;
-    connector?: string;
-    ramType?: string;
-    interface?: string;
+    socket: string;
+    connector: string;
+    ramType: string;
+    interface: string;
     storageInterfaces: string[];
-    gpuConnector?: string;
+    gpuConnector: string;
 }
 
 interface ComponentFormProps {

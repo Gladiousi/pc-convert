@@ -1,22 +1,24 @@
+import Card from "../common/Card";
 import { ComparisonResultProps } from "../../interface/compare";
-import { PCConfig, PowerScores } from "../../interface/pc";
+import { PCConfig, PowerScores, CPU, GPU, RAM, Storage, Motherboard } from "../../interface/pc";
 
 const ConfigResult: React.FC<ComparisonResultProps> = ({ pc1, pc2, result, powerScores }) => {
   const getComponentInfo = (type: keyof PowerScores, value: string): string => {
     if (!value || !powerScores) return "";
     const component = powerScores[type][value];
+    if (!component) return "";
 
     switch (type) {
       case "cpu":
-        return `Сокет: ${(component as any).socket}`;
+        return `Сокет: ${(component as CPU).socket || "N/A"}`;
       case "gpu":
-        return `Разъём: ${(component as any).connector}`;
+        return `Разъём: ${(component as GPU).connector || "N/A"}`;
       case "ram":
-        return `Тип: ${(component as any).type}`;
+        return `Тип: ${(component as RAM).type || "N/A"}`;
       case "storage":
-        return `Интерфейс: ${(component as any).interface}`;
+        return `Интерфейс: ${(component as Storage).interface || "N/A"}`;
       case "motherboard":
-        return `Сокет: ${(component as any).socket}, RAM: ${(component as any).ramType}, GPU: ${(component as any).gpuConnector}, Накопители: ${(component as any).storageInterface.join(", ")}`;
+        return `Сокет: ${(component as Motherboard).socket || "N/A"}, RAM: ${(component as Motherboard).ramType || "N/A"}, GPU: ${(component as Motherboard).gpuConnector || "N/A"}, Накопители: ${(component as Motherboard).storageInterface?.join(", ") || "N/A"}`;
       case "psu":
         return `Мощность: ${value}`;
       default:
@@ -38,7 +40,7 @@ const ConfigResult: React.FC<ComparisonResultProps> = ({ pc1, pc2, result, power
 
   return (
     <div className="w-full max-w-6xl space-y-6">
-      <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+      <Card>
         <h4 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3">Ваша сборка</h4>
         {getComponentSummary(pc1).length > 0 ? (
           <ul className="list-disc list-inside text-gray-700 text-xs sm:text-sm">
@@ -49,9 +51,9 @@ const ConfigResult: React.FC<ComparisonResultProps> = ({ pc1, pc2, result, power
         ) : (
           <p className="text-gray-600 text-xs sm:text-sm">Компоненты не выбраны</p>
         )}
-      </div>
+      </Card>
       {pc2 && (
-        <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+        <Card>
           <h4 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3">Сборка ПК 2</h4>
           {getComponentSummary(pc2).length > 0 ? (
             <ul className="list-disc list-inside text-gray-700 text-xs sm:text-sm">
@@ -62,11 +64,11 @@ const ConfigResult: React.FC<ComparisonResultProps> = ({ pc1, pc2, result, power
           ) : (
             <p className="text-gray-600 text-xs sm:text-sm">Компоненты не выбраны</p>
           )}
-        </div>
+        </Card>
       )}
       {result && (
         <div className="w-full max-w-6xl space-y-6">
-          <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+          <Card>
             <h4 className="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">
               {pc2 ? "Компьютер 1" : "Ваша сборка"}: {result.pc1Power}
             </h4>
@@ -78,9 +80,9 @@ const ConfigResult: React.FC<ComparisonResultProps> = ({ pc1, pc2, result, power
                 {result.pc1Power}
               </div>
             </div>
-          </div>
+          </Card>
           {pc2 && result.pc2Power > 0 && (
-            <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+            <Card>
               <h4 className="text-lg sm:text-2xl font-semibold text-gray-800 mb-2">Компьютер 2: {result.pc2Power}</h4>
               <div className="w-full bg-gray-200 rounded-full h-6 sm:h-8 overflow-hidden">
                 <div
@@ -90,7 +92,7 @@ const ConfigResult: React.FC<ComparisonResultProps> = ({ pc1, pc2, result, power
                   {result.pc2Power}
                 </div>
               </div>
-            </div>
+            </Card>
           )}
         </div>
       )}

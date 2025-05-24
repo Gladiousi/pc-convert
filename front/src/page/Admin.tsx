@@ -1,54 +1,58 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo, useMemo } from "react";
 import { useTabStore } from "../store/useTabStore";
+import { useApi } from "../hooks/useApi";
 import TabSelector from "../components/admin/TabSelector";
 import UserManagement from "../components/admin/UserManagement";
 import ComponentForm from "../components/admin/ComponentForm";
+import PageContainer from "../components/common/PageContainer";
+import SectionHeading from "../components/common/SectionHeading";
 import { User } from "../interface/admin";
+import { debounce } from "lodash";
 
 const Admin: React.FC = () => {
   const { token, setActiveTab } = useTabStore();
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"users" | "components">("users");
+  const { data: users, error, isLoading, request } = useApi<User[]>();
+
+  const fetchUsers = useMemo(
+    () =>
+      debounce(async () => {
+        if (token && tab === "users") {
+          await request("http://localhost:5000/admin/users", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+        }
+      }, 300),
+    [token, tab, request]
+  );
 
   useEffect(() => {
-    if (token && tab === "users") {
-      fetch("http://localhost:5000/admin/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((res) => {
-          if (!res.ok) {
-            setActiveTab("home");
-            return null;
-          }
-          return res.json();
-        })
-        .then((data) => {
-          if (data) {
-            setUsers(data);
-            setLoading(false);
-          }
-        });
-    } else if (!token) {
+    if (!token) {
+      setActiveTab("home");
+      return;
+    }
+    fetchUsers();
+  }, [token, setActiveTab, fetchUsers]);
+
+  useEffect(() => {
+    if (error) {
       setActiveTab("home");
     }
-  }, [token, setActiveTab, tab]);
+  }, [error, setActiveTab]);
 
   return (
-    <div className="w-full min-h-[80dvh] flex flex-col justify-center items-center p-4 sm:p-6 lg:p-8 bg-gray-50">
-      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-gray-800 mb-4 sm:mb-6 lg:mb-8">
-        Админка
-      </h1>
+    <PageContainer>
+      <SectionHeading>Админка</SectionHeading>
       <div className="w-full text-black max-w-3xl sm:max-w-4xl bg-white rounded-2xl shadow-lg p-4 sm:p-6">
         <TabSelector activeTab={tab} setTab={setTab} />
         {tab === "users" ? (
-          <UserManagement users={users} loading={loading} />
+          <UserManagement users={users || []} loading={isLoading} />
         ) : (
           <ComponentForm token={token} />
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 };
 
-export default Admin;
+export default memo(Admin);

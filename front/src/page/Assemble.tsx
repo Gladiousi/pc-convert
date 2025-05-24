@@ -1,123 +1,119 @@
-import { useEffect, useState } from "react";
+import { useReducer, useEffect, memo, useMemo } from "react";
 import { useTabStore } from "../store/useTabStore";
-import { checkCompatibility, calculatePower, fetchPowerScores } from "../data/pcData";
+import { checkCompatibility, calculatePower } from "../data/pcData";
 import SocketSelector from "../components/compare/SocketSelector";
 import PCConfigForm from "../components/compare/PCConfigForm";
 import ConfigResult from "../components/compare/ConfigResult";
-import { PCConfig } from "../interface/pc";
+import PageContainer from "../components/common/PageContainer";
+import SectionHeading from "../components/common/SectionHeading";
+import GradientButton from "../components/common/GradientButton";
+import ErrorList from "../components/common/ErrorList";
+import { useComponentData } from "../hooks/useComponentData";
+import { initialStateAssemble, reducerAssemble } from "../utils/page";
 
 const Assemble: React.FC = () => {
   const { token, setToken, setActiveTab, powerScores, setPowerScores } = useTabStore();
-  const [pc, setPc] = useState<PCConfig>({ cpu: "", gpu: "", ram: "", storage: "", motherboard: "", psu: "" });
-  const [errors, setErrors] = useState<string[]>([]);
-  const [sockets, setSockets] = useState<string[]>([]);
-  const [socket, setSocket] = useState<string>("");
-  const [power, setPower] = useState<number | null>(null);
+  const { powerScores: fetchedPowerScores, sockets, errors, isLoading } = useComponentData(
+    token,
+    setToken,
+    setActiveTab
+  );
+  const [state, dispatch] = useReducer(reducerAssemble, initialStateAssemble);
 
   useEffect(() => {
-    if (token) {
-      fetch("http://localhost:5000/compare", {
-        headers: { Authorization: `Bearer ${token}` },
-      }).then((res) => {
-        if (!res.ok) {
-          setToken(null);
-          setActiveTab("home");
-        }
-      });
-      loadPowerScores();
-      loadSockets();
-    } else {
-      setActiveTab("home");
+    if (fetchedPowerScores) {
+      console.log("Assemble: Setting powerScores =", fetchedPowerScores);
+      setPowerScores(fetchedPowerScores);
     }
-  }, [token, setToken, setActiveTab]);
+  }, [fetchedPowerScores, setPowerScores]);
 
-  const loadPowerScores = async () => {
+  const pcErrors = useMemo(
+    () => (powerScores ? checkCompatibility(state.pc, powerScores) : []),
+    [state.pc, powerScores]
+  );
+
+  const handleAssemble = async () => {
+    console.log("handleAssemble: Starting calculation", { pc: state.pc, powerScores });
+    dispatch({ type: "SET_CALCULATING", payload: true });
+
+    const timeout = setTimeout(() => {
+      console.error("handleAssemble: Calculation timed out");
+      dispatch({ type: "SET_ERRORS", payload: ["Время расчёта истекло"] });
+      dispatch({ type: "SET_CALCULATING", payload: false });
+    }, 5000);
+
     try {
-      const scores = await fetchPowerScores(token!);
-      setPowerScores(scores);
-    } catch (err: any) {
-      console.error("Failed to load power scores:", err);
-      setErrors(["Не удалось загрузить комплектующие: " + err.message]);
-    }
-  };
+      if (!powerScores) {
+        console.error("handleAssemble: powerScores is null");
+        dispatch({ type: "SET_ERRORS", payload: ["Данные о комплектующих не загружены"] });
+        return;
+      }
 
-  const loadSockets = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/components/filter?type=CPU", {
-        headers: { Authorization: `Bearer ${token!}` },
-      });
-      if (!res.ok) throw new Error("Failed to fetch sockets");
-      const components = await res.json();
-      const uniqueSockets = [...new Set(components.map((c: any) => c.socket).filter(Boolean))] as string[];
-      setSockets(uniqueSockets);
-    } catch (err: any) {
-      console.error("Failed to load sockets:", err);
-      setErrors(["Не удалось загрузить сокеты: " + err.message]);
-    }
-  };
+      dispatch({ type: "SET_ERRORS", payload: [] });
+      dispatch({ type: "SET_POWER", payload: null });
 
-  const handleAssemble = () => {
-    if (!powerScores) {
-      setErrors(["Данные о комплектующих не загружены"]);
-      return;
+      console.log("handleAssemble: Compatibility errors =", pcErrors);
+
+      if (pcErrors.length > 0) {
+        dispatch({ type: "SET_ERRORS", payload: pcErrors });
+        return;
+      }
+
+      const pcPower = calculatePower(state.pc, powerScores);
+      console.log("handleAssemble: Calculated power =", pcPower);
+
+      dispatch({ type: "SET_POWER", payload: pcPower });
+    } catch (err: any) {
+      console.error("handleAssemble: Error =", err);
+      dispatch({ type: "SET_ERRORS", payload: [`Ошибка при расчёте мощности: ${err.message || "Неизвестная ошибка"}`] });
+    } finally {
+      clearTimeout(timeout);
+      console.log("handleAssemble: Finished");
+      dispatch({ type: "SET_CALCULATING", payload: false });
     }
-    setErrors([]);
-    setPower(null);
-    const pcErrors = checkCompatibility(pc, powerScores);
-    if (pcErrors.length > 0) {
-      setErrors(pcErrors);
-      return;
-    }
-    const pcPower = calculatePower(pc, powerScores);
-    setPower(pcPower);
   };
 
   return (
-    <div className="w-full min-h-[80dvh] flex flex-col justify-center items-center space-y-6 p-4 sm:p-6 lg:p-8 bg-gray-50">
-      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-gray-800 text-center">
-        Сборка ПК
-      </h1>
+    <PageContainer>
+      <SectionHeading>Сборка ПК</SectionHeading>
       <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl text-center">
         Соберите свой компьютер, учитывая совместимость комплектующих, и узнайте его мощность!
       </p>
-
-      {errors.length > 0 && (
-        <div className="w-full max-w-md bg-red-100 border border-red-400 text-red-700 p-3 sm:p-4 rounded-lg shadow-lg z-20">
-          <ul className="list-disc list-inside text-xs sm:text-sm">
-            {errors.map((error, index) => (
-              <li key={index}>{error}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {powerScores ? (
-        <div className="w-full max-w-3xl">
+      <ErrorList errors={[...errors, ...state.localErrors]} />
+      {isLoading ? (
+        <div className="text-gray-600 text-sm sm:text-base text-center">Загрузка комплектующих...</div>
+      ) : (
+        <div className="w-full max-w-3xl space-y-4">
           <SocketSelector
-            socket={socket}
-            setSocket={(val) => {
-              setSocket(val);
-              setPc({ ...pc, cpu: "", motherboard: "" });
-            }}
+            socket={state.socket}
+            setSocket={(val) => dispatch({ type: "SET_SOCKET", payload: val })}
             sockets={sockets}
             label="Сокет"
           />
-          <PCConfigForm pc={pc} setPc={setPc} powerScores={powerScores} socket={socket} label="Ваш ПК" />
+          <PCConfigForm
+            pc={state.pc}
+            setPc={(pc) => dispatch({ type: "SET_PC", payload: pc })}
+            powerScores={powerScores}
+            socket={state.socket}
+            label="Ваш ПК"
+          />
         </div>
-      ) : (
-        <div className="text-gray-600 text-sm sm:text-base text-center">Загрузка комплектующих...</div>
       )}
-
-      <button
+      <GradientButton
         onClick={handleAssemble}
-        className="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm sm:text-base md:text-lg font-semibold rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 min-w-[120px]"
+        isLoading={isLoading || state.isCalculating}
+        aria-label="Рассчитать мощность сборки"
       >
         Рассчитать мощность
-      </button>
-
-      <ConfigResult pc1={pc} pc2={null} result={power ? { pc1Power: power, pc2Power: 0 } : null} powerScores={powerScores} />
-    </div>
+      </GradientButton>
+      <ConfigResult
+        pc1={state.pc}
+        pc2={null}
+        result={state.power ? { pc1Power: state.power, pc2Power: 0 } : null}
+        powerScores={powerScores}
+      />
+    </PageContainer>
   );
 };
 
-export default Assemble;
+export default memo(Assemble);

@@ -1,141 +1,141 @@
-import { useEffect, useState } from "react";
+import { useReducer, useEffect, memo, useMemo } from "react";
 import { useTabStore } from "../store/useTabStore";
-import { checkCompatibility, calculatePower, fetchPowerScores } from "../data/pcData";
+import { checkCompatibility, calculatePower } from "../data/pcData";
 import SocketSelector from "../components/compare/SocketSelector";
 import PCConfigForm from "../components/compare/PCConfigForm";
 import ConfigResult from "../components/compare/ConfigResult";
-import { PCConfig } from "../interface/pc";
+import PageContainer from "../components/common/PageContainer";
+import SectionHeading from "../components/common/SectionHeading";
+import GradientButton from "../components/common/GradientButton";
+import ErrorList from "../components/common/ErrorList";
+import { useComponentData } from "../hooks/useComponentData";
+import { reducerCompare, initialStateCompare } from "../utils/page";
 
 const Compare: React.FC = () => {
   const { token, setToken, setActiveTab, powerScores, setPowerScores } = useTabStore();
-  const [pc1, setPc1] = useState<PCConfig>({ cpu: "", gpu: "", ram: "", storage: "", motherboard: "", psu: "" });
-  const [pc2, setPc2] = useState<PCConfig>({ cpu: "", gpu: "", ram: "", storage: "", motherboard: "", psu: "" });
-  const [result, setResult] = useState<{ pc1Power: number; pc2Power: number } | null>(null);
-  const [errors, setErrors] = useState<string[]>([]);
-  const [sockets, setSockets] = useState<string[]>([]);
-  const [pc1Socket, setPc1Socket] = useState<string>("");
-  const [pc2Socket, setPc2Socket] = useState<string>("");
+  const { powerScores: fetchedPowerScores, sockets, errors, isLoading } = useComponentData(
+    token,
+    setToken,
+    setActiveTab
+  );
+  const [state, dispatch] = useReducer(reducerCompare, initialStateCompare);
 
   useEffect(() => {
-    if (token) {
-      fetch("http://localhost:5000/compare", {
-        headers: { Authorization: `Bearer ${token}` },
-      }).then((res) => {
-        if (!res.ok) {
-          setToken(null);
-          setActiveTab("home");
-        }
-      });
-      loadPowerScores();
-      loadSockets();
-    } else {
-      setActiveTab("home");
+    if (fetchedPowerScores) {
+      console.log("Compare: Setting powerScores =", fetchedPowerScores);
+      setPowerScores(fetchedPowerScores);
     }
-  }, [token, setToken, setActiveTab]);
+  }, [fetchedPowerScores, setPowerScores]);
 
-  const loadPowerScores = async () => {
+  const pc1Errors = useMemo(
+    () => (powerScores ? checkCompatibility(state.pc1, powerScores) : []),
+    [state.pc1, powerScores]
+  );
+  const pc2Errors = useMemo(
+    () => (powerScores ? checkCompatibility(state.pc2, powerScores) : []),
+    [state.pc2, powerScores]
+  );
+
+  const handleCompare = async () => {
+    console.log("handleCompare: Starting comparison", { pc1: state.pc1, pc2: state.pc2, powerScores });
+    dispatch({ type: "SET_COMPARING", payload: true });
+
+    const timeout = setTimeout(() => {
+      console.error("handleCompare: Comparison timed out");
+      dispatch({ type: "SET_ERRORS", payload: ["Время сравнения истекло"] });
+      dispatch({ type: "SET_COMPARING", payload: false });
+    }, 5000);
+
     try {
-      const scores = await fetchPowerScores(token!);
-      setPowerScores(scores);
-    } catch (err: any) {
-      console.error("Failed to load power scores:", err);
-      setErrors(["Не удалось загрузить комплектующие: " + err.message]);
-    }
-  };
+      if (!powerScores) {
+        console.error("handleCompare: powerScores is null");
+        dispatch({ type: "SET_ERRORS", payload: ["Данные о комплектующих не загружены"] });
+        return;
+      }
 
-  const loadSockets = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/components/filter?type=CPU", {
-        headers: { Authorization: `Bearer ${token!}` },
-      });
-      if (!res.ok) throw new Error("Failed to fetch sockets");
-      const components = await res.json();
-      const uniqueSockets = [...new Set(components.map((c: any) => c.socket).filter(Boolean))] as string[];
-      setSockets(uniqueSockets);
-    } catch (err: any) {
-      console.error("Failed to load sockets:", err);
-      setErrors(["Не удалось загрузить сокеты: " + err.message]);
-    }
-  };
+      dispatch({ type: "SET_ERRORS", payload: [] });
+      dispatch({ type: "SET_RESULT", payload: null });
 
-  const handleCompare = () => {
-    if (!powerScores) {
-      setErrors(["Данные о комплектующих не загружены"]);
-      return;
+      console.log("handleCompare: Errors =", { pc1Errors, pc2Errors });
+
+      if (pc1Errors.length > 0 || pc2Errors.length > 0) {
+        dispatch({
+          type: "SET_ERRORS",
+          payload: [...pc1Errors.map((e) => `ПК 1: ${e}`), ...pc2Errors.map((e) => `ПК 2: ${e}`)],
+        });
+        return;
+      }
+
+      const pc1Power = calculatePower(state.pc1, powerScores);
+      const pc2Power = calculatePower(state.pc2, powerScores);
+      console.log("handleCompare: Powers =", { pc1Power, pc2Power });
+
+      dispatch({ type: "SET_RESULT", payload: { pc1Power, pc2Power } });
+    } catch (err: any) {
+      console.error("handleCompare: Error =", err);
+      dispatch({ type: "SET_ERRORS", payload: [`Ошибка при сравнении: ${err.message || "Неизвестная ошибка"}`] });
+    } finally {
+      clearTimeout(timeout);
+      console.log("handleCompare: Finished");
+      dispatch({ type: "SET_COMPARING", payload: false });
     }
-    setErrors([]);
-    setResult(null);
-    const pc1Errors = checkCompatibility(pc1, powerScores);
-    const pc2Errors = checkCompatibility(pc2, powerScores);
-    if (pc1Errors.length > 0 || pc2Errors.length > 0) {
-      setErrors([...pc1Errors.map((e) => `ПК 1: ${e}`), ...pc2Errors.map((e) => `ПК 2: ${e}`)]);
-      return;
-    }
-    const pc1Power = calculatePower(pc1, powerScores);
-    const pc2Power = calculatePower(pc2, powerScores);
-    setResult({ pc1Power, pc2Power });
   };
 
   return (
-    <div className="w-full min-h-[80dvh] flex flex-col justify-center items-center space-y-6 p-4 sm:p-6 lg:p-8 bg-gray-50">
-      <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-gray-800 text-center">
-        Сравнение компьютеров
-      </h1>
+    <PageContainer>
+      <SectionHeading>Сравнение компьютеров</SectionHeading>
       <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl text-center">
         Соберите два компьютера, учитывая совместимость комплектующих, и сравните их мощность!
       </p>
-
-      {errors.length > 0 && (
-        <div className="w-full max-w-md bg-red-100 border border-red-400 text-red-700 p-3 sm:p-4 rounded-lg shadow-lg z-20">
-          <ul className="list-disc list-inside text-xs sm:text-sm">
-            {errors.map((error, index) => (
-              <li key={index}>{error}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {powerScores ? (
+      <ErrorList errors={[...errors, ...state.localErrors]} />
+      {isLoading ? (
+        <div className="text-gray-600 text-sm sm:text-base text-center">Загрузка комплектующих...</div>
+      ) : (
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 w-full max-w-6xl">
-          <div className="flex-1 w-full">
+          <div className="flex-1 w-full border-b lg:border-b-0 lg:border-r border-gray-200 pb-4 lg:pb-0 lg:pr-4">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">Компьютер 1</h2>
             <SocketSelector
-              socket={pc1Socket}
-              setSocket={(val) => {
-                setPc1Socket(val);
-                setPc1({ ...pc1, cpu: "", motherboard: "" });
-              }}
+              socket={state.pc1Socket}
+              setSocket={(val) => dispatch({ type: "SET_PC1_SOCKET", payload: val })}
               sockets={sockets}
               label="Сокет ПК 1"
             />
-            <PCConfigForm pc={pc1} setPc={setPc1} powerScores={powerScores} socket={pc1Socket} label="Компьютер 1" />
+            <PCConfigForm
+              pc={state.pc1}
+              setPc={(pc) => dispatch({ type: "SET_PC1", payload: pc })}
+              powerScores={powerScores}
+              socket={state.pc1Socket}
+              label="Компьютер 1"
+            />
           </div>
           <div className="flex-1 w-full">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2">Компьютер 2</h2>
             <SocketSelector
-              socket={pc2Socket}
-              setSocket={(val) => {
-                setPc2Socket(val);
-                setPc2({ ...pc2, cpu: "", motherboard: "" });
-              }}
+              socket={state.pc2Socket}
+              setSocket={(val) => dispatch({ type: "SET_PC2_SOCKET", payload: val })}
               sockets={sockets}
               label="Сокет ПК 2"
             />
-            <PCConfigForm pc={pc2} setPc={setPc2} powerScores={powerScores} socket={pc2Socket} label="Компьютер 2" />
+            <PCConfigForm
+              pc={state.pc2}
+              setPc={(pc) => dispatch({ type: "SET_PC2", payload: pc })}
+              powerScores={powerScores}
+              socket={state.pc2Socket}
+              label="Компьютер 2"
+            />
           </div>
         </div>
-      ) : (
-        <div className="text-gray-600 text-sm sm:text-base text-center">Загрузка комплектующих...</div>
       )}
-
-      <button
+      <GradientButton
         onClick={handleCompare}
-        className="px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm sm:text-base md:text-lg font-semibold rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 min-w-[120px]"
+        isLoading={isLoading || state.isComparing}
+        aria-label="Сравнить сборки"
       >
         Сравнить
-      </button>
-
-      <ConfigResult pc1={pc1} pc2={pc2} result={result} powerScores={powerScores} />
-    </div>
+      </GradientButton>
+      <ConfigResult pc1={state.pc1} pc2={state.pc2} result={state.result} powerScores={powerScores} />
+    </PageContainer>
   );
 };
 
-export default Compare;
+export default memo(Compare);

@@ -4,8 +4,55 @@ import bcrypt from "bcryptjs";
 import { sign, verify } from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 
+interface Component {
+    power: number;
+    socket?: string;
+    connector?: string;
+    type?: string;
+    interface?: string;
+    ramType?: string;
+    gpuConnector?: string;
+    storageInterface?: string[];
+}
+
+interface CPU extends Component {
+    socket: string;
+}
+
+interface GPU extends Component {
+    connector: string;
+}
+
+interface RAM extends Component {
+    type: string;
+}
+
+interface Storage extends Component {
+    interface: string;
+}
+
+interface Motherboard extends Component {
+    socket: string;
+    ramType: string;
+    gpuConnector: string;
+    storageInterface: string[];
+}
+
+interface PSU extends Component {
+    power: number;
+}
+
+interface PowerScores {
+    cpu: Record<string, CPU>;
+    gpu: Record<string, GPU>;
+    ram: Record<string, RAM>;
+    storage: Record<string, Storage>;
+    motherboard: Record<string, Motherboard>;
+    psu: Record<string, PSU>;
+}
+
 interface AuthRequest extends Request {
-  user?: { userId: number; role: string };
+  user ?: { userId: number; role: string };
 }
 
 const app = express();
@@ -122,47 +169,69 @@ app.get(
   })
 );
 
-app.post(
-  "/admin/components",
+app.get(
+  "/components",
   authenticateToken,
-  isAdmin,
   asyncHandler(async (req: AuthRequest, res: Response) => {
-    const {
-      name,
-      type,
-      power,
-      socket,
-      connector,
-      ramType,
-      interface: storageInterface,
-      storageInterfaces,
-      gpuConnector,
-    } = req.body;
+    const components = await prisma.component.findMany();
 
-    if (!name || !type || !power) {
-      return res.status(400).json({ error: "Name, type и power обязательны" });
-    }
+    const powerScores: PowerScores = {
+      cpu: {},
+      gpu: {},
+      ram: {},
+      storage: {},
+      motherboard: {},
+      psu: {},
+    };
+    const sockets: Set<string> = new Set();
 
-    const validTypes = ["CPU", "GPU", "RAM", "Storage", "Motherboard", "PSU"];
-    if (!validTypes.includes(type)) {
-      return res.status(400).json({ error: "Недопустимый тип комплектующей" });
-    }
+    components.forEach((component) => {
+      const { name, type, power, socket, connector, ramType, interface: storageInterface, storageInterfaces, gpuConnector } = component;
 
-    const component = await prisma.component.create({
-      data: {
-        name,
-        type,
-        power,
-        socket,
-        connector,
-        ramType,
-        interface: storageInterface,
-        storageInterfaces: storageInterfaces || [],
-        gpuConnector,
-      },
+      switch (type) {
+        case "CPU":
+          if (socket) {
+            powerScores.cpu[name] = { power, socket };
+            sockets.add(socket);
+          }
+          break;
+        case "GPU":
+          if (connector) {
+            powerScores.gpu[name] = { power, connector };
+          }
+          break;
+        case "RAM":
+          if (ramType) {
+            powerScores.ram[name] = { power, type: ramType };
+          }
+          break;
+        case "Storage":
+          if (storageInterface) {
+            powerScores.storage[name] = { power, interface: storageInterface };
+          }
+          break;
+        case "Motherboard":
+          if (socket && ramType && gpuConnector) {
+            powerScores.motherboard[name] = {
+              power,
+              socket,
+              ramType,
+              gpuConnector,
+              storageInterface: storageInterfaces || [],
+            };
+            sockets.add(socket);
+          }
+          break;
+        case "PSU":
+          powerScores.psu[name] = { power };
+          break;
+      }
     });
 
-    res.status(201).json({ message: "Компонент создан", component });
+    res.json({
+      powerScores,
+      sockets: Array.from(sockets),
+    });
   })
 );
 
