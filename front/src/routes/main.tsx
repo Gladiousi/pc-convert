@@ -1,4 +1,4 @@
-import { JSX, useEffect, lazy, Suspense } from "react";
+import { JSX, useEffect } from "react";
 import { useTabStore } from "../store/useTabStore";
 import Auth from "../components/Auth";
 import Home from "../page/Home";

@@ -82,18 +82,21 @@ const Compare: React.FC = () => {
   };
 
   return (
-    <PageContainer>
+    <PageContainer className="space-y-10">
       <SectionHeading>Сравнение компьютеров</SectionHeading>
       <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl text-center">
         Соберите два компьютера, учитывая совместимость комплектующих, и сравните их мощность!
+      </p>
+      <p className="text-sm sm:text-base lg:text-md text-gray-600 max-w-3xl text-center">
+        Выберите сокет для того, чтобы сразу выбрать комплектуюище выбранного сокета и не ошибиться
       </p>
       <ErrorList errors={[...errors, ...state.localErrors]} />
       {isLoading ? (
         <div className="text-gray-600 text-sm sm:text-base text-center">Загрузка комплектующих...</div>
       ) : (
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 w-full max-w-6xl">
-          <div className="flex-1 w-full border-b lg:border-b-0 lg:border-r border-gray-200 pb-4 lg:pb-0 lg:pr-4">
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">Компьютер 1</h2>
+          <div className="flex-1 w-full border-b lg:border-b-0 lg:border-r border-gray-200 pb-4 lg:pb-0 lg:pr-4 space-y-4">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2 ">Компьютер 1</h2>
             <SocketSelector
               socket={state.pc1Socket}
               setSocket={(val) => dispatch({ type: "SET_PC1_SOCKET", payload: val })}
@@ -108,8 +111,8 @@ const Compare: React.FC = () => {
               label="Компьютер 1"
             />
           </div>
-          <div className="flex-1 w-full">
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">Компьютер 2</h2>
+          <div className="flex-1 w-full space-y-4">
+            <h2 className="text-lg font-semibold text-gray-800 mb-2 ">Компьютер 2</h2>
             <SocketSelector
               socket={state.pc2Socket}
               setSocket={(val) => dispatch({ type: "SET_PC2_SOCKET", payload: val })}

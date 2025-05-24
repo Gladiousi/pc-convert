@@ -74,10 +74,13 @@ const Assemble: React.FC = () => {
   };
 
   return (
-    <PageContainer>
+    <PageContainer className="space-y-10">
       <SectionHeading>Сборка ПК</SectionHeading>
       <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl text-center">
         Соберите свой компьютер, учитывая совместимость комплектующих, и узнайте его мощность!
+      </p>
+      <p className="text-sm sm:text-base lg:text-md text-gray-600 max-w-3xl text-center">
+        Выберите сокет для того, чтобы сразу выбрать комплектуюище выбранного сокета и не ошибиться
       </p>
       <ErrorList errors={[...errors, ...state.localErrors]} />
       {isLoading ? (

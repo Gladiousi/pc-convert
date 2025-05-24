@@ -41,7 +41,7 @@ const Admin: React.FC = () => {
   }, [error, setActiveTab]);
 
   return (
-    <PageContainer>
+    <PageContainer className="space-y-10">
       <SectionHeading>Админка</SectionHeading>
       <div className="w-full text-black max-w-3xl sm:max-w-4xl bg-white rounded-2xl shadow-lg p-4 sm:p-6">
         <TabSelector activeTab={tab} setTab={setTab} />
