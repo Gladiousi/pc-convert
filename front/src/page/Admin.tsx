@@ -8,10 +8,11 @@ import PageContainer from "../components/common/PageContainer";
 import SectionHeading from "../components/common/SectionHeading";
 import { User } from "../interface/admin";
 import { debounce } from "lodash";
+import ComponentManagement from "../components/admin/ComponentManagement";
 
 const Admin: React.FC = () => {
   const { token, setActiveTab } = useTabStore();
-  const [tab, setTab] = useState<"users" | "components">("users");
+  const [tab, setTab] = useState<"users" | "components" | "componentManagement">("users");
   const { data: users, error, isLoading, request } = useApi<User[]>();
 
   const fetchUsers = useMemo(
@@ -47,8 +48,10 @@ const Admin: React.FC = () => {
         <TabSelector activeTab={tab} setTab={setTab} />
         {tab === "users" ? (
           <UserManagement users={users || []} loading={isLoading} />
-        ) : (
+        ) : tab === "components" ? (
           <ComponentForm token={token} />
+        ) : (
+          <ComponentManagement token={token} />
         )}
       </div>
     </PageContainer>

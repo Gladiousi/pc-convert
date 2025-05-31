@@ -1,4 +1,5 @@
 interface Component {
+    id?: string | undefined;
     name: string;
     type: string;
     power: number;
@@ -15,8 +16,8 @@ interface ComponentFormProps {
 }
 
 interface TabSelectorProps {
-    activeTab: "users" | "components";
-    setTab: (tab: "users" | "components") => void;
+    activeTab: "users" | "components" | 'componentManagement';
+    setTab: (tab: "users" | "components" | 'componentManagement') => void;
 }
 
 interface User {
@@ -31,4 +32,8 @@ interface UserManagementProps {
     loading: boolean;
 }
 
-export type { Component, ComponentFormProps, TabSelectorProps, UserManagementProps, User }
+interface ComponentManagementProps {
+    token: string | null;
+}
+
+export type { Component, ComponentFormProps, TabSelectorProps, UserManagementProps, User, ComponentManagementProps }

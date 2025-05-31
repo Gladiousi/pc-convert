@@ -3,18 +3,24 @@ import { TabSelectorProps } from "../../interface/admin";
 
 const TabSelector: React.FC<TabSelectorProps> = ({ activeTab, setTab }) => {
     return (
-        <div className="flex space-x-4 mb-4">
+        <div className="flex space-x-2 mb-6">
             <button
                 onClick={() => setTab("users")}
-                className={`px-4 py-2 rounded-lg ${activeTab === "users" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
+                className={`p-2 rounded-lg ${activeTab === "users" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
             >
                 Пользователи
             </button>
             <button
                 onClick={() => setTab("components")}
-                className={`px-4 py-2 rounded-lg ${activeTab === "components" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
+                className={`p-2 rounded-lg ${activeTab === "components" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
             >
-                Компоненты
+                Добавить компонент
+            </button>
+            <button
+                onClick={() => setTab("componentManagement")}
+                className={`p-2 rounded-lg ${activeTab === "componentManagement" ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
+            >
+                Управление компонентами
             </button>
         </div>
     );

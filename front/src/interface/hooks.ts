@@ -20,9 +20,9 @@ interface ComponentOptions {
 }
 
 interface ApiResponse<T> {
-  data: T | null;
-  error: string | null;
-  isLoading: boolean;
+    data: T | null;
+    error: string | null;
+    isLoading: boolean;
 }
 
-export type {FormState, UseFormOptions, ComponentOptions, ApiResponse}
+export type { FormState, UseFormOptions, ComponentOptions, ApiResponse };

@@ -257,6 +257,16 @@ app.get(
   })
 );
 
+app.get(
+  "/admin/components",
+  authenticateToken,
+  isAdmin,
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const components = await prisma.component.findMany();
+    res.json(components);
+  })
+);
+
 app.use((err: Error, req: AuthRequest, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({ error: "Something went wrong!" });

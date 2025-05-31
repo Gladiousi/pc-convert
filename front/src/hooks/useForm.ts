@@ -44,6 +44,15 @@ export const useForm = <T>({ initialValues, validate }: UseFormOptions<T>) => {
         setFormState({ values: initialValues, errors: {}, submitError: null, success: "" });
     }, [initialValues]);
 
+    const setValues = useCallback((newValues: T) => {
+        setFormState((prev) => ({
+            ...prev,
+            values: newValues,
+            errors: validate ? validate(newValues) : {},
+            submitError: null,
+        }));
+    }, [validate]);
+
     return {
         values: formState.values,
         errors: formState.errors,
@@ -52,5 +61,6 @@ export const useForm = <T>({ initialValues, validate }: UseFormOptions<T>) => {
         handleChange,
         handleSubmit,
         resetForm,
+        setValues, 
     };
 };
