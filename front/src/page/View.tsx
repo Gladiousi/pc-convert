@@ -36,7 +36,7 @@ const View = () => {
                             <img
                                 src={pc.image}
                                 alt={pc.title}
-                                className="w-full h-40 sm:h-48 object-cover rounded-lg mb-4"
+                                className="w-full h-40 sm:h-96 object-cover rounded-lg mb-4"
                             />
                             <h3 className="text-lg sm:text-xl font-semibold text-gray-800">{pc.title}</h3>
                             <p className="text-gray-600 text-sm sm:text-base">{pc.description}</p>
@@ -47,13 +47,13 @@ const View = () => {
 
             <div data-aos="fade-up" className="w-full bg-gray-200 p-6 sm:p-8 rounded-lg shadow-md">
                 <h2 className="text-2xl sm:text-3xl font-semibold text-gray-800 text-center">Сравнение компактных и хай-энд ПК</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6 text-center">
+                <div className="grid grid-cols-1 sm:grid-cols-2 h-[500px] gap-6 mt-6 text-center">
                     {computers.slice(3, 5).map((pc, index) => (
                         <div key={index} className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
                             <img
                                 src={pc.image}
                                 alt={pc.title}
-                                className="w-full h-40 sm:h-48 object-cover rounded-lg mb-4"
+                                className="w-full h-40 sm:h-96 object-cover rounded-lg mb-4"
                             />
                             <h3 className="text-lg sm:text-xl font-semibold text-gray-800">{pc.title}</h3>
                             <p className="text-gray-600 text-sm sm:text-base">{pc.description}</p>
