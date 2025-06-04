@@ -226,6 +226,45 @@ app.put(
   })
 );
 
+app.post(
+  "/admin/components",
+  authenticateToken,
+  isAdmin,
+  asyncHandler(async (req: AuthRequest, res: Response) => {
+    const {
+      name,
+      type,
+      power,
+      socket,
+      connector,
+      ramType,
+      interface: storageInterface,
+      storageInterfaces,
+      gpuConnector,
+    } = req.body;
+
+    try {
+      const component = await prisma.component.create({
+        data: {
+          name,
+          type,
+          power,
+          socket: socket || null,
+          connector: connector || null,
+          ramType: ramType || null,
+          interface: storageInterface || null,
+          storageInterfaces: storageInterfaces || [],
+          gpuConnector: gpuConnector || null,
+        },
+      });
+      res.status(201).json({ message: "Компонент создан", component });
+    } catch (error: any) {
+      console.error("Component creation error:", error);
+      res.status(400).json({ error: "Ошибка при создании компонента" });
+    }
+  })
+);
+
 app.delete(
   "/admin/components/:id",
   authenticateToken,

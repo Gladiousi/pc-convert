@@ -2,7 +2,7 @@ import computers from "../data/pc";
 
 const View = () => {
     return (
-        <div className="w-full py-8 sm:py-12 space-y-12 px-4">
+        <div className="w-full py-8 sm:py-12 space-y-12 md:space-y-40 px-4">
             <h1
                 data-aos="fade-down"
                 className="text-2xl sm:text-3xl md:text-4xl font-light text-gray-800 text-center mb-12 sm:mb-28"

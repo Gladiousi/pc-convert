@@ -1,5 +1,5 @@
 interface Component {
-    id?: string | undefined;
+    id?: number | undefined;
     name: string;
     type: string;
     power: number;

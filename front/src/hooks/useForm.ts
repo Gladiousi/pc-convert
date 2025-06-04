@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
-import { FormState, UseFormOptions } from "../interface/hooks";
+import { FormState, UseFormOptions } from "../interface/hooks"; 
 
-export const useForm = <T>({ initialValues, validate }: UseFormOptions<T>) => {
+export const useForm = <T extends object>({ initialValues, validate }: UseFormOptions<T>) => {
     const [formState, setFormState] = useState<FormState<T>>({
         values: initialValues,
         errors: {},
@@ -24,6 +24,7 @@ export const useForm = <T>({ initialValues, validate }: UseFormOptions<T>) => {
     const handleSubmit = useCallback(
         (onSubmit: (values: T) => Promise<void>) => async (e: React.FormEvent) => {
             e.preventDefault();
+
             const validationErrors = validate ? validate(formState.values) : {};
             if (Object.keys(validationErrors).length > 0) {
                 setFormState((prev) => ({ ...prev, errors: validationErrors, submitError: null }));
@@ -37,7 +38,7 @@ export const useForm = <T>({ initialValues, validate }: UseFormOptions<T>) => {
                 setFormState((prev) => ({ ...prev, submitError: err.message, errors: {} }));
             }
         },
-        [validate, formState.values]
+        [validate] 
     );
 
     const resetForm = useCallback(() => {
@@ -48,10 +49,10 @@ export const useForm = <T>({ initialValues, validate }: UseFormOptions<T>) => {
         setFormState((prev) => ({
             ...prev,
             values: newValues,
-            errors: validate ? validate(newValues) : {},
+            errors: {}, 
             submitError: null,
         }));
-    }, [validate]);
+    }, []); 
 
     return {
         values: formState.values,
@@ -61,6 +62,6 @@ export const useForm = <T>({ initialValues, validate }: UseFormOptions<T>) => {
         handleChange,
         handleSubmit,
         resetForm,
-        setValues, 
+        setValues,
     };
 };

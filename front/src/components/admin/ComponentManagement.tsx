@@ -11,16 +11,8 @@ const ComponentManagement: React.FC<ComponentManagementProps> = ({ token }) => {
     const { data: components, error, isLoading, request } = useApi<Component[]>();
     const [editingComponent, setEditingComponent] = useState<Component | null>(null);
 
-    useEffect(() => {
-        if (token) {
-            request("http://localhost:5000/admin/components", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-        }
-    }, [token, request]);
-
     const initialValues: Component = {
-        id: "",
+        id: 0,
         name: "",
         type: "",
         power: 0,
@@ -44,9 +36,17 @@ const ComponentManagement: React.FC<ComponentManagementProps> = ({ token }) => {
     });
 
     useEffect(() => {
+        if (token) {
+            request("http://localhost:5000/admin/components", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+        }
+    }, [token, request]);
+
+    useEffect(() => {
         if (editingComponent) {
             setValues({
-                id: editingComponent.id || "",
+                id: editingComponent.id || 0,
                 name: editingComponent.name || "",
                 type: editingComponent.type || "",
                 power: editingComponent.power || 0,
@@ -60,7 +60,7 @@ const ComponentManagement: React.FC<ComponentManagementProps> = ({ token }) => {
         }
     }, [editingComponent, setValues]);
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (id: number) => {
         if (!token) return;
         try {
             await request(`http://localhost:5000/admin/components/${id}`, {
@@ -77,26 +77,30 @@ const ComponentManagement: React.FC<ComponentManagementProps> = ({ token }) => {
 
     const onSubmit = async (values: Component) => {
         if (!token || !values.id) throw new Error("Требуется авторизация и ID компонента");
-        await request(`http://localhost:5000/admin/components/${values.id}`, {
-            method: "PUT",
-            headers: { Authorization: `Bearer ${token}` },
-            body: JSON.stringify({
-                name: values.name,
-                type: values.type,
-                power: parseInt(values.power.toString()),
-                socket: values.socket || null,
-                connector: values.connector || null,
-                ramType: values.ramType || null,
-                interface: values.interface || null,
-                storageInterfaces: values.storageInterfaces.length ? values.storageInterfaces : [],
-                gpuConnector: values.gpuConnector || null,
-            }),
-        });
-        resetForm();
-        setEditingComponent(null);
-        await request("http://localhost:5000/admin/components", {
-            headers: { Authorization: `Bearer ${token}` },
-        });
+        try {
+            await request(`http://localhost:5000/admin/components/${values.id}`, {
+                method: "PUT",
+                headers: { Authorization: `Bearer ${token}` },
+                body: JSON.stringify({
+                    name: values.name,
+                    type: values.type,
+                    power: values.power,
+                    socket: values.socket || null,
+                    connector: values.connector || null,
+                    ramType: values.ramType || null,
+                    interface: values.interface || null,
+                    storageInterfaces: values.storageInterfaces.length ? values.storageInterfaces : [],
+                    gpuConnector: values.gpuConnector || null,
+                }),
+            });
+            resetForm();
+            setEditingComponent(null);
+            await request("http://localhost:5000/admin/components", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+        } catch (err) {
+            console.error("Ошибка при обновлении:", err);
+        }
     };
 
     if (isLoading) {
